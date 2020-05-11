@@ -1,0 +1,155 @@
+{
+  "project_info": {
+    "project_number": "68408343603",
+    "firebase_url": "https://prime-partner-6ec44.firebaseio.com",
+    "project_id": "prime-partner-6ec44",
+    "storage_bucket": "prime-partner-6ec44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68408343603:android:9b222bc332f32524",
+        "android_client_info": {
+          "package_name": "com.mlkit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv4N7qKImJc040dp7wacyNRBFT37zJrSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "68408343603-orc0du9r8krj2aon56nb28rsju0t5932.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.primepartner"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68408343603:android:eefa58157d5375b0",
+        "android_client_info": {
+          "package_name": "com.ocr1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv4N7qKImJc040dp7wacyNRBFT37zJrSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "68408343603-orc0du9r8krj2aon56nb28rsju0t5932.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.primepartner"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68408343603:android:b1640e047d9e6738",
+        "android_client_info": {
+          "package_name": "com.primepartner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv4N7qKImJc040dp7wacyNRBFT37zJrSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "68408343603-orc0du9r8krj2aon56nb28rsju0t5932.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.primepartner"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68408343603:android:31b211665e00ce6f45b746",
+        "android_client_info": {
+          "package_name": "com.techvertica.primepartner.beta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv4N7qKImJc040dp7wacyNRBFT37zJrSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68408343603-nn3hnbtpif2qoui1ci3kf1srehestg7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "68408343603-orc0du9r8krj2aon56nb28rsju0t5932.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.primepartner"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
