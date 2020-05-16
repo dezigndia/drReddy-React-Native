@@ -30,6 +30,9 @@ build/
 local.properties
 *.iml
 
+# ios
+ios/
+
 # node.js
 #
 node_modules/
