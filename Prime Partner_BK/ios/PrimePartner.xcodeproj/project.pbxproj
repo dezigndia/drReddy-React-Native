@@ -63,6 +63,11 @@
 		D917D65B5E4141E289090D0B /* libRNGestureHandler-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FCE8900D85E4935883E295A /* libRNGestureHandler-tvOS.a */; };
 		E24386A0BECFC58FDF3A7832 /* Pods_PrimePartner_tvOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20E20CA3B40980D47EDC0070 /* Pods_PrimePartner_tvOSTests.framework */; };
 		E3D0BFD7BE4E4EB0ABAAC118 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 523B2089BC5D4559898A5F47 /* libRNGestureHandler.a */; };
+		E9B3FA5B2471176100B78D79 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FC65246FE96A00D704A0 /* libRNGestureHandler.a */; };
+		E9B3FA882471178A00B78D79 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FC6B246FE96A00D704A0 /* libRNSVG.a */; };
+		E9B3FA89247117B100B78D79 /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FC55246FE96500D704A0 /* libRNFirebase.a */; };
+		E9B3FA8A247117C500B78D79 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FC58246FE96500D704A0 /* libRNImagePicker.a */; };
+		E9B3FA8B247117D700B78D79 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FC73246FE97500D704A0 /* libRNVectorIcons.a */; };
 		E9C4FDC924702B6900D704A0 /* GTMSessionFetcher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FD4024702B6800D704A0 /* GTMSessionFetcher.framework */; };
 		E9C4FDCA24702B6900D704A0 /* FirebaseMLModelInterpreter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FD4124702B6800D704A0 /* FirebaseMLModelInterpreter.framework */; };
 		E9C4FDCB24702B6900D704A0 /* FirebaseMLCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C4FD4224702B6800D704A0 /* FirebaseMLCommon.framework */; };
@@ -726,13 +731,18 @@
 				E9C4FE0124702B6B00D704A0 /* FirebaseMLVisionLabelModel.framework in Frameworks */,
 				E9C4FE0424702B6B00D704A0 /* Protobuf.framework in Frameworks */,
 				E9C4FDE724702B6A00D704A0 /* GTMSessionFetcher.framework in Frameworks */,
+				E9B3FA5B2471176100B78D79 /* libRNGestureHandler.a in Frameworks */,
 				11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */,
 				E9C4FDF424702B6B00D704A0 /* FirebaseCrash.framework in Frameworks */,
+				E9B3FA882471178A00B78D79 /* libRNSVG.a in Frameworks */,
 				E9C4FE1624702B6C00D704A0 /* FirebaseInAppMessaging.framework in Frameworks */,
 				E9C4FDCD24702B6900D704A0 /* GTMSessionFetcher.framework in Frameworks */,
 				E9C4FDF224702B6B00D704A0 /* Protobuf.framework in Frameworks */,
+				E9B3FA89247117B100B78D79 /* libRNFirebase.a in Frameworks */,
 				E9C4FDFC24702B6B00D704A0 /* FirebaseStorage.framework in Frameworks */,
+				E9B3FA8A247117C500B78D79 /* libRNImagePicker.a in Frameworks */,
 				E9C4FDE624702B6A00D704A0 /* gRPC-C++.framework in Frameworks */,
+				E9B3FA8B247117D700B78D79 /* libRNVectorIcons.a in Frameworks */,
 				E9C4FE0A24702B6B00D704A0 /* GoogleMobileVision.framework in Frameworks */,
 				E9C4FE1024702B6C00D704A0 /* FirebaseMLNaturalLanguage.framework in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,

@@ -9,6 +9,7 @@
   "dependencies": {
     "d3": "^5.9.7",
     "install": "^0.13.0",
+    "jetifier": "^1.6.5",
     "moment": "^2.24.0",
     "native-base": "^2.12.2",
     "react": "16.8.3",
