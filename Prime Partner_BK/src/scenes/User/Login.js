@@ -14,6 +14,7 @@ import {
   ActivityIndicator,
   Alert,
   BackHandler,
+  Platform,
 } from "react-native";
 import {
   Container,
@@ -321,14 +322,16 @@ export default class Login extends Component {
                 Not Prime Partner? Enroll Now.
               </Text>
             </View>
-            <View style={[styles.enrollView, { paddingTop: 10 }]}>
-              <Text
-                onPress={() => this.props.navigation.navigate("RequestOTP")}
-                style={styles.enrollText}
-              >
-                Login With OTP
-              </Text>
-            </View>
+            {Platform.OS === "android" ? (
+              <View style={[styles.enrollView, { paddingTop: 10 }]}>
+                <Text
+                  onPress={() => this.props.navigation.navigate("RequestOTP")}
+                  style={styles.enrollText}
+                >
+                  Login With OTP
+                </Text>
+              </View>
+            ) : null}
           </ImageBackground>
           <Modal
             animationType="slide"
