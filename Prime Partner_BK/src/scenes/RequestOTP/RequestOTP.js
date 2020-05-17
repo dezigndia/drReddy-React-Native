@@ -50,17 +50,13 @@ class RequestOTP extends React.Component {
             style={styles.imageBackground}
           >
             <View style={styles.header}>
-              <View style={styles.headerBack}>
-                <Text
-                  onPress={() => this.props.navigation.navigate("Login")}
-                  style={styles.headerBackText}
-                >
-                  Back
-                </Text>
-              </View>
-              <View style={styles.headerCenter}>
-                <Text style={styles.headerCenterText}>Request OTP</Text>
-              </View>
+              <Text
+                onPress={() => this.props.navigation.navigate("Login")}
+                style={styles.headerBackText}
+              >
+                Back
+              </Text>
+              <Text style={styles.headerCenterText}>Request OTP</Text>
             </View>
             <View style={styles.contentWrapper}>
               <TextInput
@@ -99,25 +95,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#522e90",
     flexDirection: "row",
   },
-  headerBack: {
-    width: "35%",
-    height: "100%",
-  },
   imageBackground: {
     flex: 1,
     width: "100%",
     height: "100%",
   },
   headerBackText: {
-    marginLeft: 20,
+    marginLeft: "5%",
     color: "#fff",
   },
-  headerCenter: {
-    width: "60%",
-    height: "100%",
-  },
   headerCenterText: {
-    alignSelf: "flex-start",
+    paddingLeft: "30%",
     color: "#fff",
   },
   TextInput: {
@@ -133,7 +121,7 @@ const styles = StyleSheet.create({
   contentWrapper: {
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: SCREEN_HEIGHT / 3.5,
+    paddingTop: SCREEN_HEIGHT / 3,
   },
   requestButton: {
     height: 40,
