@@ -26,6 +26,7 @@ import {
   Label,
 } from "native-base";
 import firebase from "react-native-firebase";
+import DeviceInfo from 'react-native-device-info';
 
 import baseUrl from "../Constants/Constants";
 var parseString = require("xml2js").parseString;
@@ -114,7 +115,7 @@ export default class Login extends Component {
       Password: this.state.password,
       // 'MobileNo': '8879755940',
       // 'Password':'poonam',
-      DeviceID: !fcmToken ? await firebase.messaging().getToken() : fcmToken,
+      DeviceID: DeviceInfo.getUniqueId(),
     };
     const Body = Object.keys(details)
       .map(
@@ -122,7 +123,7 @@ export default class Login extends Component {
           encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
       )
       .join("&");
-    console.log("details", details);
+    console.warn("details", details);
     const options = {
       method: "POST",
       body: Body,

@@ -6,6 +6,7 @@ import XMLParser  from 'react-xml-parser'
 var parseString = require('xml2js').parseString;
 import * as ActionTypes from '../../data/actionTypes';
 import orm from 'src/data';
+import DeviceInfo from 'react-native-device-info';
 import { getState } from 'src/storeHelper';
 
 let SCREENWIDTH= Dimensions.get('screen').width;
@@ -58,7 +59,7 @@ export default class NewPassword extends Component {
         
         const details={
             'MemberId': ChemistCardNo,
-            'DeviceID':'nblsdnc',
+            'DeviceID': DeviceInfo.getUniqueId(),
             'Password':this.state.password2
         }
         console.log("details:", details);

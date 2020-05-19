@@ -11,6 +11,7 @@ import orm from 'src/data';
 import { getState } from 'src/storeHelper';
 import baseUrl from '../Constants/Constants';
 import PTRView from 'react-native-pull-to-refresh';
+import DeviceInfo from 'react-native-device-info';
 var parseString = require('xml2js').parseString;
 // import 'react-circular-progressbar/dist/styles.css';
 let SCREENHEIGHT = Dimensions.get('screen').height;
@@ -98,7 +99,7 @@ export default class HomTab extends Component {
         const details = {
             'MobileNo': this.state.mobile,
             'Password': this.state.password,
-            'DeviceID': 'sadasdasdasd'
+            'DeviceID': DeviceInfo.getUniqueId(),
         }
         const Body = Object.keys(details).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(details[key])).join('&');
 
