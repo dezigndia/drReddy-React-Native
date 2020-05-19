@@ -6,7 +6,7 @@ import store from "src/store";
 import firebase from "react-native-firebase";
 import AppWithNavigationState from "./navigators/Navigators";
 
-console.disableYellowBox = true;
+console.disableYellowBox = false;
 
 class App extends React.Component {
   async componentDidMount() {

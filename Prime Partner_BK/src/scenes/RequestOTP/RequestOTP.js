@@ -7,41 +7,70 @@ import {
   StyleSheet,
   Dimensions,
   TextInput,
-  Alert,
   TouchableOpacity,
+  ActivityIndicator,
+  ToastAndroid
 } from "react-native";
+import Modal from "react-native-modal";
+import firebase from "react-native-firebase";
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
 class RequestOTP extends React.Component {
   state = {
     mobileNumber: "",
+    confirmResult: null,
+    verificationCode: "",
+    userId: "",
+    loading: false,
+    isVisible: false,
+  };
+
+  handleVerifyCode = () => {
+    // Request for OTP verification
+    const { confirmResult, verificationCode } = this.state;
+    this.setState({ loading: true });
+    if (confirmResult) {
+      confirmResult
+        .confirm(verificationCode)
+        .then((user) => {
+          this.setState({ userId: user.uid });
+          this.setState({ isVisible: false, loading: false, verificationCode: "" });
+          this.props.navigation.navigate("MainTab");
+          ToastAndroid.show("User verified, login successful!", ToastAndroid.SHORT);
+        })
+        .catch((error) => {
+          alert(error.message);
+          console.log(error);
+        });
+    } else {
+      this.setState({ loading: false });
+      alert("Please enter a 6 digit OTP code.");
+    }
   };
 
   getOtp = () => {
+    // Request to send OTP
     const { mobileNumber } = this.state;
-    const { navigation } = this.props;
-    if (mobileNumber.length !== 10) {
-      Alert.alert(
-        "Prime Partner",
-        "Please enter the valid mobile number",
-        [
-          {
-            text: "OK",
-            onPress: () => console.log("OK Pressed"),
-          },
-        ],
-        { cancelable: true }
-      );
+    if (mobileNumber.length === 10) {
+      this.setState({ isVisible: true });
+      firebase
+        .auth()
+        .signInWithPhoneNumber(`+91 ${mobileNumber}`)
+        .then((confirmResult) => {
+          console.warn("confirmResult", confirmResult);
+          this.setState({ confirmResult: confirmResult, mobileNumber: "" });
+        })
+        .catch((error) => {
+          console.warn(error);
+        });
     } else {
-      // call get otp
-      this.setState({ mobileNumber: "" });
-      navigation.navigate("VerifyOTP");
+      alert("Please enter valid mobile number");
     }
   };
 
   render() {
-    const { mobileNumber } = this.state;
+    const { mobileNumber, loading, isVisible, verificationCode } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.container}>
@@ -60,7 +89,11 @@ class RequestOTP extends React.Component {
             </View>
             <View style={styles.contentWrapper}>
               <TextInput
-                style={styles.TextInput}
+                style={[
+                  styles.TextInput,
+                  loading ? { backgroundColor: "lightgray" } : {},
+                ]}
+                autoFocus
                 placeholder="Enter 10 digit Mobile Number"
                 placeholderTextColor="#522e90"
                 value={mobileNumber}
@@ -69,12 +102,97 @@ class RequestOTP extends React.Component {
                 keyboardType="number-pad"
               />
               <TouchableOpacity
-                style={styles.requestButton}
+                style={[
+                  styles.requestButton,
+                  loading ? { backgroundColor: "#f9f9f9" } : {},
+                ]}
                 onPress={() => this.getOtp()}
               >
                 <Text style={styles.otpRequestText}>Request OTP</Text>
               </TouchableOpacity>
             </View>
+            <Modal
+              isVisible={isVisible}
+              avoidKeyboard={true}
+              backdropOpacity={0.2}
+              style={{
+                margin: 0,
+                padding: 0,
+                marginTop: SCREEN_HEIGHT / 8,
+              }}
+              onBackButtonPress={() =>
+                this.setState({
+                  isModalVisible: !this.state.isModalVisible,
+                })
+              }
+              onBackdropPress={() =>
+                this.setState({
+                  isModalVisible: !this.state.isModalVisible,
+                })
+              }
+            >
+              <View
+                style={{
+                  flex: 1,
+                  borderTopLeftRadius: 12,
+                  borderTopRightRadius: 12,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    padding: 8,
+                    justifyContent: "flex-start",
+                    borderBottomWidth: 1,
+                    borderBottomColor: "#efefef",
+                    elevation: 1,
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "#522e90",
+                      textAlign: "center",
+                      fontSize: 16,
+                      fontWeight: "200",
+                      marginVertical: 10,
+                    }}
+                  >
+                    Verify OTP
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    marginTop: 20,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <TextInput
+                    style={[styles.TextInput]}
+                    placeholder="Enter OTP"
+                    placeholderTextColor="#522e90"
+                    value={verificationCode}
+                    onChangeText={(text) =>
+                      this.setState({ verificationCode: text })
+                    }
+                    maxLength={6}
+                    keyboardType="number-pad"
+                  />
+                  <TouchableOpacity
+                    style={styles.requestButton}
+                    onPress={() => this.handleVerifyCode()}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#ffffff" />
+                    ) : (
+                      <Text style={styles.otpRequestText}>Verify OTP</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
           </ImageBackground>
         </View>
       </SafeAreaView>

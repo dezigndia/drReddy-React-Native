@@ -32,7 +32,6 @@ import ChemistSignature from "./RewardCatalogue/ChemistSignature";
 import PSRSignature from "./RewardCatalogue/PSRSignature";
 import SaveImage from "./RewardCatalogue/SaveImage";
 import RequestOTP from "./RequestOTP";
-import VerifyOTP from './VerifyOTP';
 
 export {
   Home,
@@ -55,7 +54,6 @@ export {
   Login,
   SignUp,
   RequestOTP,
-  VerifyOTP,
   ForgotPassword,
   VerificationOTP,
   NewPassword,
