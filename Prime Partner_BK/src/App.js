@@ -1,22 +1,43 @@
 import React from "react";
-import { ImageBackground, StatusBar, AsyncStorage } from "react-native";
+import { Linking, StatusBar, AsyncStorage, Alert } from "react-native";
 import { Provider } from "react-redux";
 import { Root, StyleProvider } from "native-base";
 import store from "src/store";
 import firebase from "react-native-firebase";
 import AppWithNavigationState from "./navigators/Navigators";
+import VersionCheck from "react-native-version-check";
+
+const { version } = require("../package.json");
 
 console.disableYellowBox = false;
 
 class App extends React.Component {
-  async componentDidMount() {
+  componentDidMount() {
     this.checkPermission();
     this.createNotificationListeners();
+    if (VersionCheck.getCurrentVersion() !== version) {
+      Alert.alert(
+        "Prime Partner",
+        "Update is available for Prime Partner, Please update for better experience",
+        [
+          { text: "CANCEL", onPress: () => console.warn("OK Pressed") },
+          {
+            text: "UPDATE",
+            onPress: () =>
+              Linking.openURL(
+                "market://details?id=com.techvertica.primepartner.beta"
+              ),
+          },
+        ]
+      );
+    }
   }
+
   componentWillUnmount() {
     this.notificationListener();
     this.notificationOpenedListener();
   }
+
   //1
   async checkPermission() {
     const enabled = await firebase.messaging().hasPermission();

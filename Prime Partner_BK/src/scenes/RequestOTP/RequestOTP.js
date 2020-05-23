@@ -9,7 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  ToastAndroid
+  ToastAndroid,
 } from "react-native";
 import Modal from "react-native-modal";
 import firebase from "react-native-firebase";
@@ -34,12 +34,21 @@ class RequestOTP extends React.Component {
       confirmResult
         .confirm(verificationCode)
         .then((user) => {
-          this.setState({ userId: user.uid });
-          this.setState({ isVisible: false, loading: false, verificationCode: "" });
+          this.setState({
+            userId: user.uid,
+            isVisible: false,
+            mobileNumber: "",
+            loading: false,
+            verificationCode: "",
+          });
           this.props.navigation.navigate("MainTab");
-          ToastAndroid.show("User verified, login successful!", ToastAndroid.SHORT);
+          ToastAndroid.show(
+            "User verified, login successful!",
+            ToastAndroid.SHORT
+          );
         })
         .catch((error) => {
+          this.setState({ loading: false });
           alert(error.message);
           console.log(error);
         });
@@ -51,19 +60,22 @@ class RequestOTP extends React.Component {
 
   getOtp = () => {
     // Request to send OTP
-    const { mobileNumber } = this.state;
-    if (mobileNumber.length === 10) {
+    const { mobileNumber, confirmResult } = this.state;
+    if (mobileNumber.length === 10 && !confirmResult) {
       this.setState({ isVisible: true });
       firebase
         .auth()
         .signInWithPhoneNumber(`+91 ${mobileNumber}`)
         .then((confirmResult) => {
           console.warn("confirmResult", confirmResult);
-          this.setState({ confirmResult: confirmResult, mobileNumber: "" });
+          this.setState({ confirmResult: confirmResult });
         })
         .catch((error) => {
           console.warn(error);
         });
+    }
+    if (confirmResult) {
+      this.setState({ isVisible: true });
     } else {
       alert("Please enter valid mobile number");
     }
@@ -122,12 +134,12 @@ class RequestOTP extends React.Component {
               }}
               onBackButtonPress={() =>
                 this.setState({
-                  isModalVisible: !this.state.isModalVisible,
+                  isVisible: false,
                 })
               }
               onBackdropPress={() =>
                 this.setState({
-                  isModalVisible: !this.state.isModalVisible,
+                  isVisible: false,
                 })
               }
             >
