@@ -32,6 +32,7 @@ import ChemistSignature from "./RewardCatalogue/ChemistSignature";
 import PSRSignature from "./RewardCatalogue/PSRSignature";
 import SaveImage from "./RewardCatalogue/SaveImage";
 import RequestOTP from "./RequestOTP";
+import Campaign from './Campaign';
 
 export {
   Home,
@@ -68,4 +69,5 @@ export {
   ChemistSignature,
   PSRSignature,
   SaveImage,
+  Campaign
 };

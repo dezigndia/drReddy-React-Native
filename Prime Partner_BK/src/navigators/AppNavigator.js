@@ -41,7 +41,8 @@ import {
   Congratulations,
   ChemistSignature,
   PSRSignature,
-  SaveImage
+  SaveImage,
+  Campaign
 } from "../scenes";
 
 export const MyAccountTab = createStackNavigator(
@@ -138,7 +139,7 @@ export const AppNavigator = createAppContainer(createDrawerNavigator(
     ChemistSignature: {  screen: ChemistSignature }, 
     PSRSignature: {  screen: PSRSignature }, 
     SaveImage: {  screen: SaveImage }, 
-
+    Campaign: {screen: Campaign},
   },
   {
     initialRouteName:'Splash',
