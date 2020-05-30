@@ -53,7 +53,7 @@ const Campaign = ({ navigation }) => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       };
-      fetch(baseUrl + "/StoreCampaignImage", options)
+      fetch(baseUrl + "/GetDetailsByType", options)
         .then((res) => res.text())
         .then((res) => {
           console.warn("CampaignDetails:", res);
@@ -145,7 +145,7 @@ const Campaign = ({ navigation }) => {
       fetch(baseUrl + "/StoreCampaignImages", options)
         .then((res) => res.text())
         .then((res) => {
-          console.log("SaveSignature:", res);
+          console.warn("StoreCampaignImages:", res);
           navigation.navigate("HomeTABS");
         })
         .catch((err) => {
