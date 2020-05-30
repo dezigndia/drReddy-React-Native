@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import {
   Text,
   View,
@@ -12,9 +12,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Modal from "react-native-modal";
+import orm from 'src/data';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-picker";
 import { getState } from "src/storeHelper";
+import baseUrl from '../Constants/Constants';
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
@@ -23,6 +25,52 @@ const Campaign = ({ navigation }) => {
   const [imageData, setImageData] = React.useState(null);
   const [isVisible, setIsVisible] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [campaignDetails, setCampaignDetails] = React.useState(null);
+
+  useEffect(() => {
+    const dbState = getState().data;
+    const sess = orm.session(dbState);
+    console.log("sess", sess);
+    if (sess.User.idExists(0)) {
+      const User = sess.User.withId(0);
+      const { ChemistCardNo } = User.ref;
+      const details = {
+        Memberid: ChemistCardNo,
+        Type: 3,
+      };
+      const Body = Object.keys(details)
+        .map(
+          (key) =>
+            encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+        )
+        .join("&");
+
+      const options = {
+        method: "POST",
+        body: Body,
+        headers: {
+          Accept: "multipart/form-data",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      };
+      fetch(baseUrl + "/StoreCampaignImage", options)
+        .then((res) => res.text())
+        .then((res) => {
+          console.warn("CampaignDetails:", res);
+          setCampaignDetails(res);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          console.log("error:", err);
+          Alert.alert(
+            "Prime Partner",
+            err.message,
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+            { cancelable: false }
+          );
+        });
+    }
+  }, []);
 
   const selectPhotoTapped = () => {
     const options = {
@@ -50,7 +98,7 @@ const Campaign = ({ navigation }) => {
           ToastAndroid.CENTER
         );
       } else {
-        const source = { uri: response.uri };
+        const source = { uri: response.data };
         const imageBase64 = { uri: "data:image/png;base64," + response.data };
         setImage(source);
         setImageData(imageBase64);
@@ -77,8 +125,7 @@ const Campaign = ({ navigation }) => {
       const details = {
         Memberid: ChemistCardNo,
         Type: 3,
-        // Referenceid: navigation.state.params.OrderReference,
-        File: imageData,
+        File: image,
       };
       const Body = Object.keys(details)
         .map(
@@ -95,7 +142,7 @@ const Campaign = ({ navigation }) => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       };
-      fetch(baseUrl + "/saveimage", options)
+      fetch(baseUrl + "/StoreCampaignImages", options)
         .then((res) => res.text())
         .then((res) => {
           console.log("SaveSignature:", res);
@@ -106,7 +153,7 @@ const Campaign = ({ navigation }) => {
           console.log("error:", err);
           Alert.alert(
             "Prime Partner",
-            "Something went wrong Please try again",
+            err.message,
             [{ text: "OK", onPress: () => console.log("OK Pressed") }],
             { cancelable: false }
           );
@@ -163,7 +210,7 @@ const Campaign = ({ navigation }) => {
               style={styles.button}
             >
               <If condition={isLoading}>
-                <ActivityIndicator color="#fff" size="large" />
+                <ActivityIndicator color="#fff" size="small" />
                 <Else />
                 <MaterialIcons name="send" size={25} color="#fff" />
               </If>
