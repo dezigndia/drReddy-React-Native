@@ -16,7 +16,7 @@ import orm from 'src/data';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-picker";
 import { getState } from "src/storeHelper";
-import baseUrl from '../Constants/Constants';
+import {drlUrl} from '../Constants/Constants';
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
@@ -32,6 +32,7 @@ const Campaign = ({ navigation }) => {
     const sess = orm.session(dbState);
     console.log("sess", sess);
     if (sess.User.idExists(0)) {
+      console.log('in if');
       const User = sess.User.withId(0);
       const { ChemistCardNo } = User.ref;
       const details = {
@@ -53,7 +54,7 @@ const Campaign = ({ navigation }) => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       };
-      fetch(baseUrl + "/GetDetailsByType", options)
+      fetch(drlUrl + "/GetDetailsByType", options)
         .then((res) => res.text())
         .then((res) => {
           console.warn("CampaignDetails:", res);
@@ -240,7 +241,7 @@ const Campaign = ({ navigation }) => {
             </View>
 
             <View style={styles.imageWrapper}>
-              <Image style={styles.image} source={image} />
+              <Image style={styles.image} source={imageData} />
             </View>
           </View>
         </Modal>

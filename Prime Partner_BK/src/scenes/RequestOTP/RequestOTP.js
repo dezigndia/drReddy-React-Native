@@ -10,75 +10,148 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import Modal from "react-native-modal";
-import firebase from "react-native-firebase";
+import baseUrl from "../Constants/Constants";
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
 class RequestOTP extends React.Component {
   state = {
     mobileNumber: "",
-    confirmResult: null,
-    verificationCode: "",
-    userId: "",
+    OTP: "",
     loading: false,
     isVisible: false,
   };
 
-  handleVerifyCode = () => {
-    // Request for OTP verification
-    const { confirmResult, verificationCode } = this.state;
+  fetchOtp = () => {
+    if (this.state.mobileNumber.length !== 10) {
+      alert("Please enter valid mobile number!");
+      return;
+    }
     this.setState({ loading: true });
-    if (confirmResult) {
-      confirmResult
-        .confirm(verificationCode)
-        .then((user) => {
-          this.setState({
-            userId: user.uid,
-            isVisible: false,
-            mobileNumber: "",
-            loading: false,
-            verificationCode: "",
-          });
+    const details = {
+      Mobile: this.state.mobileNumber,
+      RefralCode: "",
+    };
+    const Body = Object.keys(details)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+      )
+      .join("&");
+
+    const options = {
+      method: "POST",
+      body: Body,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+
+    fetch(baseUrl + "/GetOTP", options)
+      .then((res) => res.text())
+      .then((res) => {
+        this.setState({ isVisible: true, loading: false });
+        data = JSON.parse(res);
+        console.log(":res", data[0].OTP);
+        this.setState({ OTP: data[0].OTP });
+        // alert('otp is:'+data[0].OTP);
+      })
+      .catch((err) => {
+        this.setState({ loading: false });
+        Alert.alert(
+          "Prime Partner",
+          "please enter valid details",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          { cancelable: false }
+        );
+        console.log("error", err);
+      });
+  };
+
+  verifyOtp = () => {
+    this.setState({ loading: true });
+    const details = {
+      Mobile: this.state.mobileNumber,
+      OTP: this.state.OTP,
+    };
+    const Body = Object.keys(details)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+      )
+      .join("&");
+
+    const options = {
+      method: "POST",
+      body: Body,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+
+    fetch(baseUrl + "/MatchOTP", options)
+      .then((res) => res.text())
+      .then((res) => {
+        console.warn(data);
+        let data = JSON.parse(res);
+        console.warn(data);
+        console.log("data:", res);
+        if (data[0].result === "Success") {
+          // call another api
           this.props.navigation.navigate("MainTab");
           ToastAndroid.show(
             "User verified, login successful!",
             ToastAndroid.SHORT
           );
-        })
-        .catch((error) => {
+          this.setState({
+            OTP: "",
+            mobileNumber: '',
+            loading: false,
+            isVisible: false
+          });
+        } else {
           this.setState({ loading: false });
-          alert(error.message);
-          console.log(error);
-        });
-    } else {
-      this.setState({ loading: false });
-      alert("Please enter a 6 digit OTP code.");
-    }
-  };
-
-  getOtp = () => {
-    // Request to send OTP
-    const { mobileNumber, confirmResult } = this.state;
-    if (mobileNumber.length === 10 && !confirmResult) {
-      this.setState({ isVisible: true });
-      firebase
-        .auth()
-        .signInWithPhoneNumber(`+91 ${mobileNumber}`)
-        .then((confirmResult) => {
-          console.warn("confirmResult", confirmResult);
-          this.setState({ confirmResult: confirmResult });
-        })
-        .catch((error) => {
-          console.warn(error);
-        });
-    }
-    if (confirmResult) {
-      this.setState({ isVisible: true });
-    } else {
-      alert("Please enter valid mobile number");
-    }
+          Alert.alert(
+            "Prime Partner",
+            "Invalid entered OTP",
+            [
+              {
+                text: "OK",
+                onPress: () =>
+                  this.setState({
+                    OTP: "",
+                  }),
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      })
+      .catch((err) => {
+        this.setState({ loading: false }, () =>
+          this.setModalVisible(!this.state.modalVisible)
+        );
+        console.log("error:", err);
+        Alert.alert(
+          "Prime Partner",
+          "Invalid entered OTP",
+          [
+            {
+              text: "OK",
+              onPress: () =>
+                this.setState({
+                  code: "",
+                }),
+            },
+          ],
+          { cancelable: false }
+        );
+      });
   };
 
   render() {
@@ -101,10 +174,7 @@ class RequestOTP extends React.Component {
             </View>
             <View style={styles.contentWrapper}>
               <TextInput
-                style={[
-                  styles.TextInput,
-                  loading ? { backgroundColor: "lightgray" } : {},
-                ]}
+                style={[styles.TextInput]}
                 autoFocus
                 placeholder="Enter 10 digit Mobile Number"
                 placeholderTextColor="#522e90"
@@ -114,13 +184,14 @@ class RequestOTP extends React.Component {
                 keyboardType="number-pad"
               />
               <TouchableOpacity
-                style={[
-                  styles.requestButton,
-                  loading ? { backgroundColor: "#f9f9f9" } : {},
-                ]}
-                onPress={() => this.getOtp()}
+                style={[styles.requestButton]}
+                onPress={() => this.fetchOtp()}
               >
-                <Text style={styles.otpRequestText}>Request OTP</Text>
+                {loading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text style={styles.otpRequestText}>Request OTP</Text>
+                )}
               </TouchableOpacity>
             </View>
             <Modal
@@ -186,15 +257,13 @@ class RequestOTP extends React.Component {
                     placeholder="Enter OTP"
                     placeholderTextColor="#522e90"
                     value={verificationCode}
-                    onChangeText={(text) =>
-                      this.setState({ verificationCode: text })
-                    }
-                    maxLength={6}
+                    onChangeText={(text) => this.setState({ OTP: text })}
+                    maxLength={4}
                     keyboardType="number-pad"
                   />
                   <TouchableOpacity
                     style={styles.requestButton}
-                    onPress={() => this.handleVerifyCode()}
+                    onPress={() => this.verifyOtp()}
                   >
                     {loading ? (
                       <ActivityIndicator color="#ffffff" />

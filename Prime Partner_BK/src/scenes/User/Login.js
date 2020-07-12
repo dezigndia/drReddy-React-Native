@@ -58,6 +58,7 @@ export default class Login extends Component {
     return true;
   };
   componentDidMount() {
+    console.log(DeviceInfo.getUniqueId());
     this.backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       this.handleBackPress
