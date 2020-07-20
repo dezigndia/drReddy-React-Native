@@ -26,6 +26,7 @@ var parseString = require("xml2js").parseString;
 import * as ActionTypes from "../../data/actionTypes";
 import orm from "src/data";
 import { getState } from "src/storeHelper";
+import { drlUrl } from "../Constants/Constants";
 
 // sampleData=[
 //     {
@@ -80,6 +81,7 @@ export default class CatalogueHistory extends Component {
       OTP: "",
       otpLoader: false,
       isVisible: false,
+      orderId: "",
     };
   }
 
@@ -89,9 +91,11 @@ export default class CatalogueHistory extends Component {
     if (sess.User.idExists(0)) {
       const User = sess.User.withId(0);
       const { ChemistCardNo } = User.ref;
-
+      console.log("ChemistCardNo", ChemistCardNo);
       const details = {
-        MemberLogin: ChemistCardNo,
+        user: "DRL_API",
+        password: "3JA2ASJx^7",
+        memberLogin: ChemistCardNo,
       };
 
       const Body = Object.keys(details)
@@ -111,10 +115,10 @@ export default class CatalogueHistory extends Component {
       };
       let data = [];
       _that = this;
-      fetch(baseUrl + "/GetOrderByMemberLogin", options)
+      fetch(drlUrl + "/GetOrderByMemberLogin", options)
         .then((res) => res.text())
         .then((res) => {
-          //   console.log("res",res);
+          console.log("res", res);
           parseString(res, async (err, result) => {
             console.log("result", result);
             if (
@@ -136,24 +140,32 @@ export default class CatalogueHistory extends Component {
                     // Address1:item.Address1[0],
                     // Address2: item.Address2[0],
                     // Address3: item.Address3[0],
-                    CardNumber: item.CardNumber[0],
-                    CityName: item.CityName[0],
+                    CardNumber: item.CardNumber
+                      ? item.CardNumber[0]
+                      : undefined,
+                    CityName: item.CityName ? item.CityName[0] : undefined,
                     // DeliveryDate:item.DeliveryDate[0],
                     DeliveryStatus: "Not Delivered",
                     // DispatchDate:item.DispatchDate[0],
-                    GiftRequiredPoints: item.GiftRequiredPoints[0],
-                    ImageURL: item.ImageURL[0],
-                    ItemName: item.ItemName[0],
-                    Itemcode: item.Itemcode[0],
-                    OrderDate: item.OrderDate[0],
-                    OrderID: item.OrderID[0],
-                    OrderReference: item.OrderReference[0],
-                    Pincode: item.Pincode[0],
-                    Quantity: item.Quantity[0],
-                    ReceiveStatus: item.ReceiveStatus[0],
+                    GiftRequiredPoints: item.GiftRequiredPoints
+                      ? item.GiftRequiredPoints[0]
+                      : undefined,
+                    ImageURL: item.ImageURL ? item.ImageURL[0] : undefined,
+                    ItemName: item.ItemName ? item.ItemName[0] : undefined,
+                    Itemcode: item.Itemcode ? item.Itemcode[0] : undefined,
+                    OrderDate: item.OrderDate ? item.OrderDate[0] : undefined,
+                    OrderID: item.OrderID ? item.OrderID[0] : undefined,
+                    OrderReference: item.OrderReference
+                      ? item.OrderReference[0]
+                      : undefined,
+                    Pincode: item.Pincode ? item.Pincode[0] : undefined,
+                    Quantity: item.Quantity ? item.Quantity[0] : undefined,
+                    ReceiveStatus: item.ReceiveStatus
+                      ? item.ReceiveStatus[0]
+                      : undefined,
                     // RedemptionStatus:item.RedemptionStatus[0],
-                    StateName: item.StateName[0],
-                    Status: item.Status[0],
+                    StateName: item.StateName ? item.StateName[0] : undefined,
+                    Status: item.Status ? item.Status[0] : undefined,
                     // TrackingAWBno:item.TrackingAWBno[0]
                   };
                   // console.log("if",obb);
@@ -163,54 +175,37 @@ export default class CatalogueHistory extends Component {
                     // Address1:item.Address1[0],
                     // Address2: item.Address2[0],
                     // Address3: item.Address3[0],
-                    CardNumber: item.CardNumber[0],
-                    CityName: item.CityName[0],
+                    CardNumber: item.CardNumber
+                      ? item.CardNumber[0]
+                      : undefined,
+                    CityName: item.CityName ? item.CityName[0] : undefined,
                     // DeliveryDate:item.DeliveryDate[0],
-                    DeliveryStatus: item.DeliveryStatus[0],
+                    DeliveryStatus: "Not Delivered",
                     // DispatchDate:item.DispatchDate[0],
-                    GiftRequiredPoints: item.GiftRequiredPoints[0],
-                    ImageURL: item.ImageURL[0],
-                    ItemName: item.ItemName[0],
-                    Itemcode: item.Itemcode[0],
-                    OrderDate: item.OrderDate[0],
-                    OrderID: item.OrderID[0],
-                    OrderReference: item.OrderReference[0],
-                    Pincode: item.Pincode[0],
-                    Quantity: item.Quantity[0],
-                    ReceiveStatus: item.ReceiveStatus[0],
+                    GiftRequiredPoints: item.GiftRequiredPoints
+                      ? item.GiftRequiredPoints[0]
+                      : undefined,
+                    ImageURL: item.ImageURL ? item.ImageURL[0] : undefined,
+                    ItemName: item.ItemName ? item.ItemName[0] : undefined,
+                    Itemcode: item.Itemcode ? item.Itemcode[0] : undefined,
+                    OrderDate: item.OrderDate ? item.OrderDate[0] : undefined,
+                    OrderID: item.OrderID ? item.OrderID[0] : undefined,
+                    OrderReference: item.OrderReference
+                      ? item.OrderReference[0]
+                      : undefined,
+                    Pincode: item.Pincode ? item.Pincode[0] : undefined,
+                    Quantity: item.Quantity ? item.Quantity[0] : undefined,
+                    ReceiveStatus: item.ReceiveStatus
+                      ? item.ReceiveStatus[0]
+                      : undefined,
                     // RedemptionStatus:item.RedemptionStatus[0],
-                    StateName: item.StateName[0],
-                    Status: item.Status[0],
+                    StateName: item.StateName ? item.StateName[0] : undefined,
+                    Status: item.Status ? item.Status[0] : undefined,
                     // TrackingAWBno:item.TrackingAWBno[0]
                   };
                   // console.log("else",obb);
                   data.push(obb);
                 }
-                // let obb= {
-                //     Address1:item.Address1[0],
-                //     Address2: item.Address2[0],
-                //     Address3: item.Address3[0],
-                //     CardNumber:item.CardNumber[0],
-                //         CityName:item.CityName[0],
-                //         // DeliveryDate:item.DeliveryDate[0],
-                //         // DeliveryStatus:item.DeliveryStatus[0],
-                //         // DispatchDate:item.DispatchDate[0],
-                //     GiftRequiredPoints:item.GiftRequiredPoints[0],
-                //     ImageURL:item.ImageURL[0],
-                //     ItemName:item.ItemName[0],
-                //     Itemcode:item.Itemcode[0],
-                //     OrderDate:item.OrderDate[0],
-                //     OrderID:item.OrderID[0],
-                //     OrderReference:item.OrderReference[0],
-                //     Pincode:item.Pincode[0],
-                //     Quantity:item.Quantity[0],
-                //     ReceiveStatus:item.ReceiveStatus[0],
-                //     // RedemptionStatus:item.RedemptionStatus[0],
-                //     StateName:item.StateName[0],
-                //     Status:item.Status[0],
-                //     // TrackingAWBno:item.TrackingAWBno[0]
-                // }
-                //  data.push(obb);
               });
               console.log(data);
               _that.setState({ data: data, loading: false });
@@ -226,10 +221,54 @@ export default class CatalogueHistory extends Component {
     }
   };
 
+  getProductDetails = () => {
+    const details = {
+      user: "DRL_API",
+      password: "3JA2ASJx^7",
+      OrderReference: this.state.orderId,
+      GiftReceiveImageUrl1: "Received",
+      GiftReceiveImageUrl2: "",
+      GiftReceiveImageUrl3: "",
+    };
+
+    const Body = Object.keys(details)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+      )
+      .join("&");
+
+    const options = {
+      method: "POST",
+      body: Body,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+
+    fetch(drlUrl + "/UpdateOrderDeliveryByOrderReference", options)
+      .then((res) => res.text())
+      .then((res) => {
+        console.log("res", res);
+        this.props.navigation.navigate("MainTab");
+        this.setState({
+          OTP: "",
+          mobileNumber: "",
+          otpLoader: false,
+          isVisible: false,
+        });
+      })
+      .catch((err) => {
+        console.log("error:", err);
+        alert("Something went wrong, please contact admin!");
+      });
+  };
+
   verifyOtp = () => {
     this.setState({ otpLoader: true });
     if (this.state.OTP.length !== 4) {
-      alert('Please enter valid OTP');
+      alert("OTP not received, Please try again");
       return;
     }
     const dbState = getState().data;
@@ -266,18 +305,7 @@ export default class CatalogueHistory extends Component {
         console.warn(data);
         console.log("data:", res);
         if (data[0].result === "Success") {
-          // call another api
-          this.props.navigation.navigate("MainTab");
-          ToastAndroid.show(
-            "User verified, login successful!",
-            ToastAndroid.SHORT
-          );
-          this.setState({
-            OTP: "",
-            mobileNumber: "",
-            otpLoader: false,
-            isVisible: false,
-          });
+          this.getProductDetails();
         } else {
           this.setState({ otpLoader: false });
           Alert.alert(
@@ -316,7 +344,8 @@ export default class CatalogueHistory extends Component {
       });
   };
 
-  fetchOtp = () => {
+  fetchOtp = (orderId) => {
+    this.setState({ orderId: orderId });
     const dbState = getState().data;
     const sess = orm.session(dbState);
     if (sess.User.idExists(0)) {
@@ -354,7 +383,6 @@ export default class CatalogueHistory extends Component {
           this.setState({ isVisible: true });
           data = JSON.parse(res);
           console.log(":res", data[0].OTP);
-          this.setState({ OTP: data[0].OTP });
           // alert('otp is:'+data[0].OTP);
         })
         .catch((err) => {
@@ -443,35 +471,26 @@ export default class CatalogueHistory extends Component {
                     : "#666666",
                 marginRight: 10,
               }}
-              // style={{
-              //   height: 20,
-              //   padding: 13,
-              //   borderWidth: 0,
-              //   justifyContent: "center",
-              //   alignItems: "center",
-              //   backgroundColor: "#00D084",
-              //   marginRight: 10,
-              // }}
-              // disabled={
-              //   item.Status === "Approved" &&
-              //   item.DeliveryStatus === "Delivered" &&
-              //   item.ReceiveStatus === "Not Received"
-              //     ? false
-              //     : true
-              // }
+              disabled={
+                item.Status === "Approved" &&
+                item.DeliveryStatus === "Delivered" &&
+                item.ReceiveStatus === "Not Received"
+                  ? false
+                  : true
+              }
               onPress={() => {
-                // if (
-                //   item.Status === "Approved" &&
-                //   item.DeliveryStatus === "Delivered" &&
-                //   item.ReceiveStatus === "Not Received"
-                // ) {
-                  // this.props.navigation.navigate("PSRSignature", {
-                  //     OrderReference: item.OrderReference,
-                  // })
+                if (
+                  item.Status === "Approved" &&
+                  item.DeliveryStatus === "Delivered" &&
+                  item.ReceiveStatus === "Not Received"
+                ) {
+                  this.props.navigation.navigate("PSRSignature", {
+                    OrderReference: item.OrderReference,
+                  });
                   console.warn("pressed");
                   console.log(this.props.navigation);
-                  this.fetchOtp();
-                // }
+                  this.fetchOtp(item.OrderID);
+                }
               }}
             >
               <Text style={{ color: "#fff" }}>RECEIVED</Text>
@@ -559,11 +578,13 @@ export default class CatalogueHistory extends Component {
             onBackButtonPress={() =>
               this.setState({
                 isVisible: false,
+                loading: false,
               })
             }
             onBackdropPress={() =>
               this.setState({
                 isVisible: false,
+                loading: false,
               })
             }
           >
@@ -610,9 +631,7 @@ export default class CatalogueHistory extends Component {
                   placeholder="Enter OTP"
                   placeholderTextColor="#522e90"
                   value={OTP}
-                  onChangeText={(text) =>
-                    this.setState({ OTP: text })
-                  }
+                  onChangeText={(text) => this.setState({ OTP: text })}
                   maxLength={4}
                   keyboardType="number-pad"
                 />

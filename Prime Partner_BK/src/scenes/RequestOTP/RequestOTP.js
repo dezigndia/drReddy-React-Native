@@ -9,23 +9,39 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  ToastAndroid,
   Alert,
 } from "react-native";
 import Modal from "react-native-modal";
-import baseUrl from "../Constants/Constants";
+import baseUrl, { drlUrl } from "../Constants/Constants";
+import * as ActionTypes from "../../data/actionTypes";
+import orm from "src/data";
+import { getState } from "src/storeHelper";
+
+const convert = require("xml-js");
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
+
+const MEMBERSHIP_LEVELS = ["SILVER", "GOLD", "PLATINUM"];
 
 class RequestOTP extends React.Component {
   state = {
     mobileNumber: "",
-    OTP: "",
+    otp: "",
     loading: false,
+    verifyOtpLoader: false,
     isVisible: false,
+    memberLogin: "",
+  };
+
+  getMembership = (nextTier) => {
+    if (nextTier === "SILVER" || nextTier === "GOLD")
+      return MEMBERSHIP_LEVELS[0];
+    return MEMBERSHIP_LEVELS[1];
   };
 
   fetchOtp = () => {
+    this.setState({ isVisible: true });
+
     if (this.state.mobileNumber.length !== 10) {
       alert("Please enter valid mobile number!");
       return;
@@ -56,9 +72,6 @@ class RequestOTP extends React.Component {
       .then((res) => {
         this.setState({ isVisible: true, loading: false });
         data = JSON.parse(res);
-        console.log(":res", data[0].OTP);
-        this.setState({ OTP: data[0].OTP });
-        // alert('otp is:'+data[0].OTP);
       })
       .catch((err) => {
         this.setState({ loading: false });
@@ -72,11 +85,226 @@ class RequestOTP extends React.Component {
       });
   };
 
+  getAccountDetails = () => {
+    const { dispatch } = this.props.navigation;
+    const details = {
+      user: "DRL_API",
+      password: "3JA2ASJx^7",
+      memberLogin: this.state.memberLogin,
+    };
+    const Body = Object.keys(details)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+      )
+      .join("&");
+    const options = {
+      method: "POST",
+      body: Body,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+
+    fetch(drlUrl + "/GetDefaultAccountByLogin", options)
+      .then((res) => res.text())
+      .then((res) => {
+        const xml = convert.xml2json(res, {
+          compact: true,
+          spaces: 4,
+        });
+        const parsedXml = JSON.parse(xml);
+        this.setState({ isVisible: !this.state.isVisible });
+        this.setState({
+          AccountID:
+            parsedXml.ReturnObjectOfAccountEntity.Value.AccountID._text,
+          AccountTypeID:
+            parsedXml.ReturnObjectOfAccountEntity.Value.AccountTypeID._text,
+          TotalEarnPoint:
+            parsedXml.ReturnObjectOfAccountEntity.Value.TotalEarnPoint._text,
+          TotalSpentPoint:
+            parsedXml.ReturnObjectOfAccountEntity.Value.TotalSpentPoint._text,
+          TotalExpiredPoint:
+            parsedXml.ReturnObjectOfAccountEntity.Value.TotalExpiredPoint._text,
+          Balance: parsedXml.ReturnObjectOfAccountEntity.Value.Balance._text,
+          AccountStatusCodeID: true,
+          CreatedBy:
+            parsedXml.ReturnObjectOfAccountEntity.Value.CreatedBy._text,
+          CreatedOn:
+            parsedXml.ReturnObjectOfAccountEntity.Value.CreatedOn._text,
+          UpdatedBy:
+            parsedXml.ReturnObjectOfAccountEntity.Value.UpdatedBy._text,
+          UpdatedOn:
+            parsedXml.ReturnObjectOfAccountEntity.Value.UpdatedOn._text,
+        });
+        const User = Object.assign(
+          {},
+          {
+            id: 0,
+            mobile: this.state.mobileNumber,
+            AccountID:
+              parsedXml.ReturnObjectOfAccountEntity.Value.AccountID._text,
+            AccountTypeID:
+              parsedXml.ReturnObjectOfAccountEntity.Value.AccountTypeID._text,
+            Balance: parsedXml.ReturnObjectOfAccountEntity.Value.Balance._text,
+            ChemistCardNo: this.state.memberLogin,
+            DaysRemainingforNextTier: this.state.DaysRemainingforNextTier,
+            LastTierUpgradeDate: this.state.LastTierUpgradeDate,
+            Membership: this.state.Membership,
+            NextTierLevel: this.state.NextTierLevel,
+            Output: this.state.Value,
+            Points: this.state.Points,
+            PointsEarned: this.state.PointsEarned,
+            PointsRequired: this.state.PointsRequired,
+            TotalEarnPoint:
+              parsedXml.ReturnObjectOfAccountEntity.Value.TotalEarnPoint._text,
+            TotalExpiredPoint:
+              parsedXml.ReturnObjectOfAccountEntity.Value.TotalExpiredPoint
+                ._text,
+            TotalSpentPoint:
+              parsedXml.ReturnObjectOfAccountEntity.Value.TotalSpentPoint._text,
+            UpdatedBy:
+              parsedXml.ReturnObjectOfAccountEntity.Value.UpdatedBy._text,
+            UpdatedOn:
+              parsedXml.ReturnObjectOfAccountEntity.Value.UpdatedOn._text,
+            CreatedBy:
+              parsedXml.ReturnObjectOfAccountEntity.Value.CreatedBy._text,
+            CreatedOn:
+              parsedXml.ReturnObjectOfAccountEntity.Value.CreatedOn._text,
+            login: "true",
+            password: "password",
+          }
+        );
+        dispatch({
+          type: ActionTypes.USER_DATA,
+          User,
+        });
+        Alert.alert(
+          "Prime Partner",
+          "Login successfully",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          { cancelable: false }
+        );
+
+        const dbState = getState().data;
+        const sess = orm.session(dbState);
+        console.log("sess", sess);
+        this.props.navigation.navigate("MainTab");
+      })
+      .catch((err) => {
+        console.log("error:", err);
+        this.setState({ verifyOtpLoader: false });
+        alert('GetDefaultAccountByLogin api fail');
+        alert("Something went wrong, please try again!");
+      });
+  };
+
+  getUserDashboardDetails = () => {
+    const details = {
+      user: "DRL_API",
+      password: "3JA2ASJx^7",
+      memberLogin: this.state.memberLogin,
+    };
+    const Body = Object.keys(details)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+      )
+      .join("&");
+    const options = {
+      method: "POST",
+      body: Body,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+
+    fetch(drlUrl + "/GetDashboardDetailsOfChemist", options)
+      .then((res) => res.text())
+      .then((res) => {
+        const xml = convert.xml2json(res, {
+          compact: true,
+          spaces: 4,
+        });
+        const parsedXml = JSON.parse(xml);
+        const memberShip = this.getMembership(
+          parsedXml.DashboardDetails.NextTierLevel._text
+        );
+        this.setState({
+          DaysRemainingforNextTier:
+            parsedXml.DashboardDetails.DaysRemainingforNextTier._text,
+          LastTierUpgradeDate:
+            parsedXml.DashboardDetails.LastTierUpgradeDate._text,
+          NextTierLevel: parsedXml.DashboardDetails.NextTierLevel._text,
+          PointsEarned: parsedXml.DashboardDetails.PointsEarned._text,
+          Points: parsedXml.DashboardDetails.PointsEarned._text,
+          PointsRequired: parsedXml.DashboardDetails.PointsRequired._text,
+          Value: parsedXml.DashboardDetails.Value._text,
+          Membership: memberShip,
+        });
+        this.getAccountDetails();
+      })
+      .catch((err) => {
+        console.log("error:", err);
+        this.setState({ verifyOtpLoader: false });
+        alert('GetDashboardDetailsOfChemist api fail');
+        alert("Something went wrong, please try again!");
+      });
+  };
+
+  getUserCardNumber = () => {
+    const details = {
+      user: "DRL_API",
+      password: "3JA2ASJx^7",
+      MobileNo: this.state.mobileNumber,
+    };
+    const Body = Object.keys(details)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+      )
+      .join("&");
+    const options = {
+      method: "POST",
+      body: Body,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+    fetch(drlUrl + "/GetChemistCardNoByMobileNo", options)
+      .then((res) => res.text())
+      .then((res) => {
+        const xml = convert.xml2json(res, {
+          compact: true,
+          spaces: 4,
+        });
+        this.setState({
+          memberLogin: JSON.parse(xml).ArrayOfGetChemistCardNoResponse
+            .GetChemistCardNoResponse.ChemistCardNo._text,
+        });
+        this.getUserDashboardDetails();
+      })
+      .catch((err) => {
+        console.log("error:", err);
+        this.setState({ verifyOtpLoader: false });
+        alert('GetChemistCardNoByMobileNo api fail');
+        alert("Something went wrong, please try again!");
+      });
+  };
+
   verifyOtp = () => {
-    this.setState({ loading: true });
+    if (this.state.otp.length !== 4) {
+      alert('Please enter valid OTP');
+      return;
+    }
+    console.log('this.state.otp', this.state.otp);
+    this.setState({ verifyOtpLoader: true });
     const details = {
       Mobile: this.state.mobileNumber,
-      OTP: this.state.OTP,
+      OTP: this.state.otp,
     };
     const Body = Object.keys(details)
       .map(
@@ -97,25 +325,11 @@ class RequestOTP extends React.Component {
     fetch(baseUrl + "/MatchOTP", options)
       .then((res) => res.text())
       .then((res) => {
-        console.warn(data);
         let data = JSON.parse(res);
-        console.warn(data);
-        console.log("data:", res);
         if (data[0].result === "Success") {
-          // call another api
-          this.props.navigation.navigate("MainTab");
-          ToastAndroid.show(
-            "User verified, login successful!",
-            ToastAndroid.SHORT
-          );
-          this.setState({
-            OTP: "",
-            mobileNumber: '',
-            loading: false,
-            isVisible: false
-          });
+          this.getUserCardNumber();
         } else {
-          this.setState({ loading: false });
+          this.setState({ verifyOtpLoader: false });
           Alert.alert(
             "Prime Partner",
             "Invalid entered OTP",
@@ -124,7 +338,7 @@ class RequestOTP extends React.Component {
                 text: "OK",
                 onPress: () =>
                   this.setState({
-                    OTP: "",
+                    otp: "",
                   }),
               },
             ],
@@ -133,10 +347,9 @@ class RequestOTP extends React.Component {
         }
       })
       .catch((err) => {
-        this.setState({ loading: false }, () =>
-          this.setModalVisible(!this.state.modalVisible)
-        );
+        this.setState({ verifyOtpLoader: false });
         console.log("error:", err);
+        alert('MatchOtp api fail');
         Alert.alert(
           "Prime Partner",
           "Invalid entered OTP",
@@ -155,7 +368,7 @@ class RequestOTP extends React.Component {
   };
 
   render() {
-    const { mobileNumber, loading, isVisible, verificationCode } = this.state;
+    const { mobileNumber, loading, verifyOtpLoader, isVisible, verificationCode } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.container}>
@@ -257,7 +470,7 @@ class RequestOTP extends React.Component {
                     placeholder="Enter OTP"
                     placeholderTextColor="#522e90"
                     value={verificationCode}
-                    onChangeText={(text) => this.setState({ OTP: text })}
+                    onChangeText={(text) => this.setState({ otp: text })}
                     maxLength={4}
                     keyboardType="number-pad"
                   />
@@ -265,7 +478,7 @@ class RequestOTP extends React.Component {
                     style={styles.requestButton}
                     onPress={() => this.verifyOtp()}
                   >
-                    {loading ? (
+                    {verifyOtpLoader ? (
                       <ActivityIndicator color="#ffffff" />
                     ) : (
                       <Text style={styles.otpRequestText}>Verify OTP</Text>

@@ -230,7 +230,7 @@ export default class SideBar extends React.Component {
 
             <ListItem 
               button
-              onPress={() => this.props.navigation.navigate("Campaign")}
+              onPress={() => this.props.navigation.navigate("CampaignList")}
               style={{ flexDirection: "row" }}
             >
               <MaterialIcons name="camera" size={25} color="#fff" />
