@@ -34,6 +34,7 @@ import SaveImage from "./RewardCatalogue/SaveImage";
 import RequestOTP from "./RequestOTP";
 import Campaign from './Campaign';
 import CampaignList from './CampaignList';
+import ImagePreview from './ImagePreview';
 
 export {
   Home,
@@ -72,4 +73,5 @@ export {
   SaveImage,
   Campaign,
   CampaignList,
+  ImagePreview,
 };

@@ -43,7 +43,8 @@ import {
   PSRSignature,
   SaveImage,
   Campaign,
-  CampaignList
+  CampaignList,
+  ImagePreview,
 } from "../scenes";
 
 export const MyAccountTab = createStackNavigator(
@@ -142,6 +143,7 @@ export const AppNavigator = createAppContainer(createDrawerNavigator(
     SaveImage: {  screen: SaveImage }, 
     Campaign: {screen: Campaign},
     CampaignList: {screen: CampaignList},
+    ImagePreview: {screen: ImagePreview},
   },
   {
     initialRouteName:'Splash',
