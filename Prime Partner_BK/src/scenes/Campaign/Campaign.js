@@ -12,65 +12,27 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Modal from "react-native-modal";
-import orm from 'src/data';
+import orm from "src/data";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-picker";
 import { getState } from "src/storeHelper";
-import {drlUrl} from '../Constants/Constants';
+import { drlUrl } from "../Constants/Constants";
+
+const convert = require("xml-js");
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
 const Campaign = ({ navigation }) => {
   const [image, setImage] = React.useState(null);
+  const [campId, setCampId] = React.useState(undefined);
   const [imageData, setImageData] = React.useState(null);
   const [isVisible, setIsVisible] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [campaignDetails, setCampaignDetails] = React.useState(null);
 
   useEffect(() => {
-    const dbState = getState().data;
-    const sess = orm.session(dbState);
-    console.log("sess", sess);
-    if (sess.User.idExists(0)) {
-      console.log('in if');
-      const User = sess.User.withId(0);
-      const { ChemistCardNo } = User.ref;
-      const details = {
-        Memberid: ChemistCardNo,
-        Type: 3,
-      };
-      const Body = Object.keys(details)
-        .map(
-          (key) =>
-            encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-        )
-        .join("&");
-
-      const options = {
-        method: "POST",
-        body: Body,
-        headers: {
-          Accept: "multipart/form-data",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      };
-      fetch(drlUrl + "/GetDetailsByType", options)
-        .then((res) => res.text())
-        .then((res) => {
-          console.warn("CampaignDetails:", res);
-          setCampaignDetails(res);
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          console.log("error:", err);
-          Alert.alert(
-            "Prime Partner",
-            err.message,
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-            { cancelable: false }
-          );
-        });
-    }
+    const campId = navigation.getParam("campId");
+    setCampId(campId);
   }, []);
 
   const selectPhotoTapped = () => {
@@ -119,45 +81,86 @@ const Campaign = ({ navigation }) => {
     setIsLoading(true);
     const dbState = getState().data;
     const sess = orm.session(dbState);
-    console.log("sess", sess);
     if (sess.User.idExists(0)) {
       const User = sess.User.withId(0);
-      const { id, ChemistCardNo } = User.ref;
-      const details = {
-        Memberid: ChemistCardNo,
-        Type: 3,
-        File: image,
+      const { ChemistCardNo } = User.ref;
+
+      const imageDetails = {
+        image: image,
       };
-      const Body = Object.keys(details)
+
+      const imageBody = Object.keys(imageDetails)
         .map(
           (key) =>
-            encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+            encodeURIComponent(key) + "=" + encodeURIComponent(imageDetails[key])
         )
         .join("&");
 
-      const options = {
+      fetch("http://primepartner.fbmdigital.in/index.php", {
         method: "POST",
-        body: Body,
+        body: imageBody,
         headers: {
           Accept: "multipart/form-data",
-          "Content-Type": "application/x-www-form-urlencoded",
         },
-      };
-      fetch(baseUrl + "/StoreCampaignImages", options)
-        .then((res) => res.text())
+      })
         .then((res) => {
-          console.warn("StoreCampaignImages:", res);
-          navigation.navigate("HomeTABS");
+
+          const details = {
+            user: "DRL_API",
+            password: "3JA2ASJx^7",
+            MemberLogin: ChemistCardNo,
+            CampaignID: campId,
+            ImageURL: res.url,
+          };
+
+          const Body = Object.keys(details)
+          .map(
+            (key) =>
+              encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+          )
+          .join("&");
+
+          const options = {
+            method: "POST",
+            body: Body,
+            headers: {
+              Accept: "multipart/form-data",
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          };
+
+          fetch(drlUrl + "/StoreCampaignImages", options)
+            .then((res) => res.text())
+            .then((res) => {
+              console.warn("StoreCampaignImages:", res);
+              const xml = convert.xml2json(res, {
+                compact: true,
+                spaces: 4,
+              });
+              const parsedXml = JSON.parse(xml);
+              console.log('parsedXml', parsedXml);
+              if (parsedXml.string._text) {
+                navigation.navigate("CampaignList");
+                alert('Image uploaded successfully!');
+              } else {
+                alert('Image failed to upload!');
+              }
+              setIsLoading(false);
+            })
+            .catch((err) => {
+              setIsLoading(false);
+              console.log("error:", err);
+              Alert.alert(
+                "Prime Partner",
+                err.message,
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+              );
+            });
         })
         .catch((err) => {
-          setIsLoading(false);
-          console.log("error:", err);
-          Alert.alert(
-            "Prime Partner",
-            err.message,
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-            { cancelable: false }
-          );
+          alert('StoreCampaignImages api failed!');
+          console.log(err.message);
         });
     }
   };
@@ -241,7 +244,11 @@ const Campaign = ({ navigation }) => {
             </View>
 
             <View style={styles.imageWrapper}>
-              <Image style={styles.image} source={imageData} />
+              <Image
+                resizeMode="contain"
+                style={styles.image}
+                source={imageData}
+              />
             </View>
           </View>
         </Modal>

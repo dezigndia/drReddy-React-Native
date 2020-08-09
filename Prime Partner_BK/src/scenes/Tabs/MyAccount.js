@@ -385,7 +385,7 @@ export default class MyAccount extends Component {
                         />
                         </Text>
                         <Text style={{alignSelf:'center', fontSize:14, }}>Buy More, Earn More !</Text>
-                        <Text style={{alignSelf:'center', fontSize:14, color:'#000' }}>Points are valid for 2 years from their date of earning</Text>
+                        <Text style={{alignSelf:'center', fontSize:14, color:'#000' }}>Points are valid for 1 years from their date of earning</Text>
                     </View>
                     <View style={{height:1, borderWidth:.5, borderStyle:'dashed', borderRadius:2, marginLeft:10, marginRight:10}}/>
                     <View style={{flexDirection:'row', borderWidth:0, height:SCREENHEIGHT* 0.12}}>

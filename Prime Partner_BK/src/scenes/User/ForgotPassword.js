@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, View, StyleSheet, BackHandler, Dimensions, SafeAreaView, ImageBackground, Image, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native'
 import { Container, Header, Content, Form, Item, Input, Label } from 'native-base';
 import baseUrl from '../Constants/Constants';
+import { baseUrlProd } from "../Constants/production";
 
 
 var parseString = require('xml2js').parseString;
@@ -46,7 +47,7 @@ export default class ForgetPassword extends Component {
             }
         };
           
-          fetch(baseUrl+'/GetOTP', options)
+          fetch(baseUrlProd+'/GetOTP', options)
             .then(res =>res.text())
             .then(res => {
                 this.setState({loading:false},()=>this.setModalVisible(!this.state.modalVisible));

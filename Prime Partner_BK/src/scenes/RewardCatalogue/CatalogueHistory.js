@@ -20,13 +20,12 @@ let SCREENHEIGHT = Dimensions.get("screen").height;
 import Modal from "react-native-modal";
 import firebase from "react-native-firebase";
 // import baseUrl from '../Constants/Constants';
-import baseUrl from "../Constants/production";
+import baseUrl, { baseUrlProd } from "../Constants/production";
 var parseString = require("xml2js").parseString;
 
 import * as ActionTypes from "../../data/actionTypes";
 import orm from "src/data";
 import { getState } from "src/storeHelper";
-import { drlUrl } from "../Constants/Constants";
 
 // sampleData=[
 //     {
@@ -93,8 +92,6 @@ export default class CatalogueHistory extends Component {
       const { ChemistCardNo } = User.ref;
       console.log("ChemistCardNo", ChemistCardNo);
       const details = {
-        user: "DRL_API",
-        password: "3JA2ASJx^7",
         memberLogin: ChemistCardNo,
       };
 
@@ -115,7 +112,7 @@ export default class CatalogueHistory extends Component {
       };
       let data = [];
       _that = this;
-      fetch(drlUrl + "/GetOrderByMemberLogin", options)
+      fetch(baseUrl + "/GetOrderByMemberLogin", options)
         .then((res) => res.text())
         .then((res) => {
           console.log("res", res);
@@ -223,8 +220,6 @@ export default class CatalogueHistory extends Component {
 
   getProductDetails = () => {
     const details = {
-      user: "DRL_API",
-      password: "3JA2ASJx^7",
       OrderReference: this.state.orderId,
       GiftReceiveImageUrl1: "Received",
       GiftReceiveImageUrl2: "",
@@ -247,7 +242,7 @@ export default class CatalogueHistory extends Component {
       },
     };
 
-    fetch(drlUrl + "/UpdateOrderDeliveryByOrderReference", options)
+    fetch(baseUrl + "/UpdateOrderDeliveryByOrderReference", options)
       .then((res) => res.text())
       .then((res) => {
         console.log("res", res);
@@ -297,7 +292,7 @@ export default class CatalogueHistory extends Component {
       },
     };
 
-    fetch(baseUrl + "/MatchOTP", options)
+    fetch(baseUrlProd + "/MatchOTP", options)
       .then((res) => res.text())
       .then((res) => {
         console.warn(data);
@@ -377,13 +372,12 @@ export default class CatalogueHistory extends Component {
         },
       };
 
-      fetch(baseUrl + "/GetOTP", options)
+      fetch(baseUrlProd + "/GetOTP", options)
         .then((res) => res.text())
         .then((res) => {
           this.setState({ isVisible: true });
           data = JSON.parse(res);
           console.log(":res", data[0].OTP);
-          // alert('otp is:'+data[0].OTP);
         })
         .catch((err) => {
           Alert.alert(
@@ -424,7 +418,7 @@ export default class CatalogueHistory extends Component {
         </View>
         <View style={{ marginTop: 10 }}>
           {item.Status === "Approved" &&
-            item.DeliveryStatus !== "Delivered" && (
+            item.DeliveryStatus !== "SMS Delivered" && (
               <Image
                 source={require("../assets/approved.png")}
                 style={{ height: 50, width: SCREENWIDTH, resizeMode: "center" }}
@@ -443,7 +437,7 @@ export default class CatalogueHistory extends Component {
             />
           )}
           {item.Status === "Approved" &&
-            item.DeliveryStatus === "Delivered" && (
+            item.DeliveryStatus === "SMS Delivered" && (
               <Image
                 source={require("../assets/delivered.png")}
                 style={{ height: 50, width: SCREENWIDTH, resizeMode: "center" }}
@@ -465,7 +459,8 @@ export default class CatalogueHistory extends Component {
                 alignItems: "center",
                 backgroundColor:
                   item.Status === "Approved" &&
-                  item.DeliveryStatus === "Delivered" &&
+                  (item.DeliveryStatus === "SMS Delivered" ||
+                    item.RedemptionStatus === "SMS Delivered") &&
                   item.ReceiveStatus === "Not Received"
                     ? "#00D084"
                     : "#666666",
@@ -473,7 +468,8 @@ export default class CatalogueHistory extends Component {
               }}
               disabled={
                 item.Status === "Approved" &&
-                item.DeliveryStatus === "Delivered" &&
+                (item.DeliveryStatus === "SMS Delivered" ||
+                  item.RedemptionStatus === "SMS Delivered") &&
                 item.ReceiveStatus === "Not Received"
                   ? false
                   : true
@@ -481,12 +477,13 @@ export default class CatalogueHistory extends Component {
               onPress={() => {
                 if (
                   item.Status === "Approved" &&
-                  item.DeliveryStatus === "Delivered" &&
+                  (item.DeliveryStatus === "SMS Delivered" ||
+                    item.RedemptionStatus === "SMS Delivered") &&
                   item.ReceiveStatus === "Not Received"
                 ) {
-                  this.props.navigation.navigate("PSRSignature", {
-                    OrderReference: item.OrderReference,
-                  });
+                  // this.props.navigation.navigate("PSRSignature", {
+                  //   OrderReference: item.OrderReference,
+                  // });
                   console.warn("pressed");
                   console.log(this.props.navigation);
                   this.fetchOtp(item.OrderID);

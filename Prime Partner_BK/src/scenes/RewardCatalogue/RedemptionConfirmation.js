@@ -3,9 +3,11 @@ import { Text, View, StyleSheet, BackHandler, Dimensions, TouchableOpacity, Link
 import { DrawerActions, NavigationAction, NavigationEvents } from 'react-navigation'
 import Entypo from 'react-native-vector-icons/Entypo';
 import baseUrl from '../Constants/Constants';
+import { baseUrlProd } from "../Constants/production";
 import * as ActionTypes from '../../data/actionTypes';
 import orm from 'src/data';
 import { getState } from 'src/storeHelper'
+
 let SCREENWIDTH = Dimensions.get('screen').width;
 let SCREENHEIGHT = Dimensions.get('screen').height;
 
@@ -82,7 +84,7 @@ export default class ContactUs extends Component {
         }
     };
       
-      fetch(baseUrl+'/GetOTP', options)
+      fetch(baseUrlProd+'/GetOTP', options)
         .then(res =>res.text())
         .then(res => {
             this.setState({loading:false},()=>this.setModalVisible(!this.state.modalVisible));

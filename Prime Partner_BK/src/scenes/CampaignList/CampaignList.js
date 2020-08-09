@@ -3,10 +3,11 @@ import {
   ScrollView,
   Dimensions,
   StatusBar,
-  Image,
+  TouchableOpacity,
   View,
   Text,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import orm from "src/data";
 import { drlUrl } from "../Constants/Constants";
@@ -14,54 +15,13 @@ import { getState } from "src/storeHelper";
 
 const convert = require("xml-js");
 
-const DATA = [
-  {
-    id: 0,
-    campName: "Campaign Name 1",
-    campDesc: "Campaign Description",
-    from: "12-06-2020",
-    to: "22-07-2020",
-    bonus: "600",
-    imageUrl: "",
-  },
-  {
-    id: 1,
-    campName: "Campaign Name 2",
-    campDesc:
-      "Campaign Description Campaign Description Campaign Description Campaign Description Campaign Description",
-    from: "12-06-2020",
-    to: "22-07-2020",
-    bonus: "600",
-    imageUrl:
-      "https://image.freepik.com/free-vector/surprise-theme-happy-birthday-card-illustration_1344-199.jpg",
-  },
-  {
-    id: 2,
-    campName: "Campaign Name 2",
-    campDesc:
-      "Campaign Description Campaign Description Campaign Description Campaign Description Campaign Description",
-    from: "12-06-2020",
-    to: "22-07-2020",
-    bonus: "600",
-    imageUrl: "",
-  },
-  {
-    id: 3,
-    campName: "Campaign Name 2",
-    campDesc:
-      "Campaign Description Campaign Description Campaign Description Campaign Description Campaign Description",
-    from: "12-06-2020",
-    to: "22-07-2020",
-    bonus: "600",
-    imageUrl: "",
-  },
-];
-
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
 const CampaignList = ({ navigation }) => {
+  const [campaignList, setCampaignList] = React.useState([]);
+
   useEffect(() => {
-    const CAMPAIGN_LIST = [];
+    const campaign_list = [];
     const dbState = getState().data;
     const sess = orm.session(dbState);
     const User = sess.User.withId(0);
@@ -117,6 +77,8 @@ const CampaignList = ({ navigation }) => {
       },
     };
 
+    const campaignObjDetails = [];
+
     fetch(drlUrl + "/GetDetailsByType", options)
       .then((res) => res.text())
       .then((res) => {
@@ -125,59 +87,83 @@ const CampaignList = ({ navigation }) => {
           spaces: 4,
         });
         const parsedXml = JSON.parse(xml);
-        console.log("parsedXml", parsedXml);
-        Object.keys(parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table).map(
-          (item, index) => {
-            const {
-              CampaignID,
-              CampaignName,
-              CampaignDescription,
-              StartDate,
-              EndDate,
-            } = item;
-            return console.log(
-              "item, A",
-              item,
-              CampaignID,
-              CampaignName,
-              CampaignDescription,
-              StartDate,
-              EndDate
-            );
-          }
-        );
+        if (
+          Array.isArray(parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table)
+        ) {
+          parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table.map(
+            (item, index) => {
+              let obj = {};
+              delete item._attributes;
+              obj = item;
+              campaignObjDetails.push(obj);
+            }
+          );
+        } else {
+          campaignObjDetails.push(
+            parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table
+          );
+        }
+
+        const campaignObjImages = [];
+
+        fetch(drlUrl + "/GetDetailsByType", newOptions)
+          .then((res) => res.text())
+          .then((res) => {
+            const xml = convert.xml2json(res, {
+              compact: true,
+              spaces: 4,
+            });
+            const parsedXml = JSON.parse(xml);
+            if (
+              Array.isArray(
+                parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table
+              )
+            ) {
+              parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table.map(
+                (item, index) => {
+                  let obj = {};
+                  delete item._attributes;
+                  obj = item;
+                  campaignObjImages.push(obj);
+                }
+              );
+            } else {
+              campaignObjImages.push(
+                parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table
+              );
+            }
+            campaignObjDetails.map((campDetails, campDetailsIndex) => {
+              const {
+                CampaignID: { _text },
+              } = campDetails;
+              if (
+                _text ===
+                (campaignObjImages[campDetailsIndex] &&
+                  campaignObjImages[campDetailsIndex].CampaignID._text)
+              ) {
+                Object.assign(campDetails, campaignObjImages[campDetailsIndex]);
+                campaign_list.push(campDetails);
+                setCampaignList(campaign_list);
+              }
+            });
+          })
+          .catch((err) => {
+            console.log("err B", err.message);
+            alert("Failed to fetch campaign image!");
+          });
       })
       .catch((err) => {
         console.log("err A", err.message);
-      });
-
-    fetch(drlUrl + "/GetDetailsByType", newOptions)
-      .then((res) => res.text())
-      .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
-        const parsedXml = JSON.parse(xml);
-        console.log("parsedXml", parsedXml);
-        Object.keys(parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table).map(
-          (item, index) => {
-            const { CampaignName, ImageURL, Status, StartDate, EndDate } = item;
-            return console.log(
-              "item B", item,
-              CampaignName,
-              ImageURL,
-              Status,
-              StartDate,
-              EndDate
-            );
-          }
-        );
-      })
-      .catch((err) => {
-        console.log("err B", err.message);
+        alert("Failed to fetch campaign details!");
       });
   }, []);
+
+  const getDate = (startDate) => {
+    let date = new Date(`${startDate}`);
+    let fullDate;
+    fullDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    return fullDate;
+  };
 
   return (
     <>
@@ -192,33 +178,55 @@ const CampaignList = ({ navigation }) => {
         <Text style={styles.headerCenterText}>CampaignList</Text>
         <Text> </Text>
       </View>
-      <ScrollView style={styles.container}>
-        {DATA.map((item, index) => {
-          const { id, campName, campDesc, from, to, bonus, imageUrl } = item;
-          return (
-            <View key={id} style={styles.card}>
-              <Text style={styles.campName}>{campName}</Text>
-              <Text style={styles.campDesc}>{campDesc}</Text>
-              <Text style={styles.campDetails}>From: {from}</Text>
-              <Text style={styles.campDetails}>To: {to}</Text>
-              <Text style={styles.campDetails}>Bonus: {bonus}</Text>
-              <Text style={styles.campDetails}>
-                Image:{" "}
-                <Text
-                  style={styles.imageLink}
-                  onPress={() =>
-                    navigation.navigate("ImagePreview", {
-                      imageUrl: imageUrl,
-                    })
-                  }
-                >
-                  view
+      {campaignList.length > 0 ? (
+        <ScrollView style={styles.container}>
+          {campaignList.map((item, index) => {
+            const {
+              CampaignID,
+              CampaignName,
+              CampaignDescription,
+              StartDate,
+              EndDate,
+              Bonus,
+              ImageURL,
+              Status,
+            } = item;
+            return (
+              <View key={CampaignID._text} style={styles.card}>
+                <Text style={styles.campName}>{CampaignName._text}</Text>
+                <Text style={styles.campDesc}>{CampaignDescription._text}</Text>
+                <Text style={styles.campDetails}>From: {getDate(StartDate._text)}</Text>
+                <Text style={styles.campDetails}>To: {getDate(EndDate._text)}</Text>
+                <Text style={styles.campDetails}>
+                  Bonus: {Bonus ? Bonus._text : "NA"}
                 </Text>
-              </Text>
-            </View>
-          );
-        })}
-      </ScrollView>
+                <Text style={styles.campDetails}>
+                  Image:{" "}
+                  <Text
+                    style={styles.imageLink}
+                    onPress={() =>
+                      navigation.navigate("ImagePreview", {
+                        imageUrl: ImageURL._text,
+                      })
+                    }
+                  >
+                    view
+                  </Text>
+                </Text>
+                <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.navigate('Campaign', {
+                  campId: CampaignID._text
+                })} style={styles.uploadImgBtn}>
+                  <Text style={styles.uploadImgText}>Upload Image</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
+      ) : (
+        <View style={styles.indicator}>
+          <ActivityIndicator color="#522e90" size="large" />
+        </View>
+      )}
     </>
   );
 };
@@ -234,7 +242,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   card: {
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 30,
     paddingHorizontal: 20,
     borderRadius: 8,
     elevation: 1,
@@ -275,4 +284,27 @@ const styles = StyleSheet.create({
     color: "#522e90",
     fontWeight: "600",
   },
+  indicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  uploadImgBtn: {
+    position: 'absolute',
+    height: 40,
+    bottom: -20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+    backgroundColor: "#522e90",
+    borderRadius: 4,
+    zIndex: 1,
+    elevation: 1,
+    flex: 1,
+  },
+  uploadImgText: {
+    color: "#fff",
+  }
 });
