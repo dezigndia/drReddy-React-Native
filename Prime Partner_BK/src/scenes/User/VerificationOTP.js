@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, BackHandler, Dimensions, SafeAreaView, ImageBackground, Image, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native'
 import { Container, Header, Content, Form, Item, Input, Label } from 'native-base';
-import baseUrl from '../Constants/Constants';
+import baseUrl, { baseUrlProd } from "../Constants/production";
 import XMLParser  from 'react-xml-parser'
 var parseString = require('xml2js').parseString;
 import * as ActionTypes from '../../data/actionTypes';
@@ -109,7 +109,7 @@ export default class VerificationOTP extends Component {
             }
         };
           
-          fetch(baseUrl+'/MatchOTP', options)
+          fetch(baseUrlProd+'/MatchOTP', options)
             .then(res =>res.text())
             .then(res => {
                 this.setState({loading:false},()=>this.setModalVisible(!this.state.modalVisible))
