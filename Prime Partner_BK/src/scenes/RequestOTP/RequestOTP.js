@@ -92,29 +92,34 @@ class RequestOTP extends React.Component {
       password: "3JA2ASJx^7",
       memberLogin: this.state.memberLogin,
     };
-    const Body = Object.keys(details)
-      .map(
-        (key) =>
-          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-      )
-      .join("&");
+    // const Body = Object.keys(details)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    Body.append("user", "DRL_API");
+    Body.append("password", "3JA2ASJx^7");
+    Body.append("memberLogin", JSON.stringify(this.state.memberLogin));
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
 
     fetch(drlUrl + "/GetDefaultAccountByLogin", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
-        const parsedXml = JSON.parse(xml);
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4,
+        // });
+        // const parsedXml = JSON.parse(xml);
+        const parsedXml = res;
         this.setState({ isVisible: !this.state.isVisible });
         this.setState({
           AccountID:
@@ -195,7 +200,7 @@ class RequestOTP extends React.Component {
       .catch((err) => {
         console.log("error:", err);
         this.setState({ verifyOtpLoader: false });
-        alert('GetDefaultAccountByLogin api fail');
+        alert("GetDefaultAccountByLogin api fail");
         alert("Something went wrong, please try again!");
       });
   };
@@ -222,13 +227,14 @@ class RequestOTP extends React.Component {
     };
 
     fetch(drlUrl + "/GetDashboardDetailsOfChemist", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
-        const parsedXml = JSON.parse(xml);
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4,
+        // });
+        // const parsedXml = JSON.parse(xml);
+        const parsedXml = res;
         const memberShip = this.getMembership(
           parsedXml.DashboardDetails.NextTierLevel._text
         );
@@ -249,7 +255,7 @@ class RequestOTP extends React.Component {
       .catch((err) => {
         console.log("error:", err);
         this.setState({ verifyOtpLoader: false });
-        alert('GetDashboardDetailsOfChemist api fail');
+        alert("GetDashboardDetailsOfChemist api fail");
         alert("Something went wrong, please try again!");
       });
   };
@@ -260,29 +266,34 @@ class RequestOTP extends React.Component {
       password: "3JA2ASJx^7",
       MobileNo: this.state.mobileNumber,
     };
-    const Body = Object.keys(details)
-      .map(
-        (key) =>
-          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-      )
-      .join("&");
+    // const Body = Object.keys(details)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    Body.append("user", "DRL_API");
+    Body.append("password", "3JA2ASJx^7");
+    Body.append("mobile", JSON.stringify(this.state.mobileNumber));
+
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
     fetch(drlUrl + "/GetChemistCardNoByMobileNo", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4,
+        // });
         this.setState({
-          memberLogin: JSON.parse(xml).ArrayOfGetChemistCardNoResponse
+          memberLogin: JSON.parse(res).ArrayOfGetChemistCardNoResponse
             .GetChemistCardNoResponse.ChemistCardNo._text,
         });
         this.getUserDashboardDetails();
@@ -290,17 +301,17 @@ class RequestOTP extends React.Component {
       .catch((err) => {
         console.log("error:", err);
         this.setState({ verifyOtpLoader: false });
-        alert('GetChemistCardNoByMobileNo api fail');
+        alert("GetChemistCardNoByMobileNo api fail");
         alert("Something went wrong, please try again!");
       });
   };
 
   verifyOtp = () => {
     if (this.state.otp.length !== 4) {
-      alert('Please enter valid OTP');
+      alert("Please enter valid OTP");
       return;
     }
-    console.log('this.state.otp', this.state.otp);
+    console.log("this.state.otp", this.state.otp);
     this.setState({ verifyOtpLoader: true });
     const details = {
       Mobile: this.state.mobileNumber,
@@ -349,7 +360,7 @@ class RequestOTP extends React.Component {
       .catch((err) => {
         this.setState({ verifyOtpLoader: false });
         console.log("error:", err);
-        alert('MatchOtp api fail');
+        alert("MatchOtp api fail");
         Alert.alert(
           "Prime Partner",
           "Invalid entered OTP",
@@ -368,7 +379,13 @@ class RequestOTP extends React.Component {
   };
 
   render() {
-    const { mobileNumber, loading, verifyOtpLoader, isVisible, verificationCode } = this.state;
+    const {
+      mobileNumber,
+      loading,
+      verifyOtpLoader,
+      isVisible,
+      verificationCode,
+    } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.container}>

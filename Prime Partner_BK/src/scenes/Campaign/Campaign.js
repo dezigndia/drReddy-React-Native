@@ -92,7 +92,9 @@ const Campaign = ({ navigation }) => {
       const imageBody = Object.keys(imageDetails)
         .map(
           (key) =>
-            encodeURIComponent(key) + "=" + encodeURIComponent(imageDetails[key])
+            encodeURIComponent(key) +
+            "=" +
+            encodeURIComponent(imageDetails[key])
         )
         .join("&");
 
@@ -104,7 +106,6 @@ const Campaign = ({ navigation }) => {
         },
       })
         .then((res) => {
-
           const details = {
             user: "DRL_API",
             password: "3JA2ASJx^7",
@@ -113,37 +114,45 @@ const Campaign = ({ navigation }) => {
             ImageURL: res.url,
           };
 
-          const Body = Object.keys(details)
-          .map(
-            (key) =>
-              encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-          )
-          .join("&");
+          // const Body = Object.keys(details)
+          // .map(
+          //   (key) =>
+          //     encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+          // )
+          // .join("&");
 
+          const Body = new FormData();
+          Body.append("user", "DRL_API");
+          Body.append("password", "3JA2ASJx^7");
+          Body.append("MemberLogin", JSON.stringify(ChemistCardNo));
+          Body.append("CampaignID", JSON.stringify(campId));
+          Body.append("ImageURL", res.url);
           const options = {
             method: "POST",
             body: Body,
             headers: {
               Accept: "multipart/form-data",
-              "Content-Type": "application/x-www-form-urlencoded",
+              "Content-Type": "application/json",
             },
           };
 
           fetch(drlUrl + "/StoreCampaignImages", options)
-            .then((res) => res.text())
+            .then((res) => res)
             .then((res) => {
               console.warn("StoreCampaignImages:", res);
-              const xml = convert.xml2json(res, {
-                compact: true,
-                spaces: 4,
-              });
-              const parsedXml = JSON.parse(xml);
-              console.log('parsedXml', parsedXml);
+              // const xml = convert.xml2json(res, {
+              //   compact: true,
+              //   spaces: 4,
+              // });
+              //const parsedXml = JSON.parse(xml);
+              const parsedXml = res;
+              // console.log('parsedXml', parsedXml);
+              /*<----------------Check Further---------------------->*/
               if (parsedXml.string._text) {
                 navigation.navigate("CampaignList");
-                alert('Image uploaded successfully!');
+                alert("Image uploaded successfully!");
               } else {
-                alert('Image failed to upload!');
+                alert("Image failed to upload!");
               }
               setIsLoading(false);
             })
@@ -159,7 +168,7 @@ const Campaign = ({ navigation }) => {
             });
         })
         .catch((err) => {
-          alert('StoreCampaignImages api failed!');
+          alert("StoreCampaignImages api failed!");
           console.log(err.message);
         });
     }

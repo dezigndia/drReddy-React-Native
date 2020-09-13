@@ -41,30 +41,40 @@ const CampaignList = ({ navigation }) => {
       type: "ShowCampaignImages",
     };
 
-    const Body = Object.keys(detailsForCampDetails)
-      .map(
-        (key) =>
-          encodeURIComponent(key) +
-          "=" +
-          encodeURIComponent(detailsForCampDetails[key])
-      )
-      .join("&");
+    // const Body = Object.keys(detailsForCampDetails)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) +
+    //       "=" +
+    //       encodeURIComponent(detailsForCampDetails[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    newBody.append("user", "DRL_API");
+    newBody.append("password", "3JA2ASJx^7");
+    newBody.append("MemberID", JSON.stringify(AccountID));
+    newBody.append("type", "ShowCampaignImages");
 
-    const newBody = Object.keys(detailsForCampImages)
-      .map(
-        (key) =>
-          encodeURIComponent(key) +
-          "=" +
-          encodeURIComponent(detailsForCampImages[key])
-      )
-      .join("&");
+    // const newBody = Object.keys(detailsForCampImages)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) +
+    //       "=" +
+    //       encodeURIComponent(detailsForCampImages[key])
+    //   )
+    //   .join("&");
+    const newBody = new FormData();
+    newBody.append("user", "DRL_API");
+    newBody.append("password", "3JA2ASJx^7");
+    newBody.append("MemberID", JSON.stringify(AccountID));
+    newBody.append("type", "ShowCampaignImages");
 
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
 
@@ -73,20 +83,22 @@ const CampaignList = ({ navigation }) => {
       body: newBody,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
 
     const campaignObjDetails = [];
 
     fetch(drlUrl + "/GetDetailsByType", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
-        const parsedXml = JSON.parse(xml);
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4,
+        // });
+        // const parsedXml = JSON.parse(xml);
+        const parsedXml = res;
+        /*<-----------------------------Check further-------------------------------->*/
         if (
           Array.isArray(parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table)
         ) {
@@ -107,13 +119,15 @@ const CampaignList = ({ navigation }) => {
         const campaignObjImages = [];
 
         fetch(drlUrl + "/GetDetailsByType", newOptions)
-          .then((res) => res.text())
+          .then((res) => res)
           .then((res) => {
-            const xml = convert.xml2json(res, {
-              compact: true,
-              spaces: 4,
-            });
-            const parsedXml = JSON.parse(xml);
+            // const xml = convert.xml2json(res, {
+            //   compact: true,
+            //   spaces: 4,
+            // });
+            // const parsedXml = JSON.parse(xml);
+            const parsedXml = res;
+            /*<-----------------------------Check further-------------------------------->*/
             if (
               Array.isArray(
                 parsedXml.DataSet["diffgr:diffgram"].NewDataSet.Table
@@ -195,8 +209,12 @@ const CampaignList = ({ navigation }) => {
               <View key={CampaignID._text} style={styles.card}>
                 <Text style={styles.campName}>{CampaignName._text}</Text>
                 <Text style={styles.campDesc}>{CampaignDescription._text}</Text>
-                <Text style={styles.campDetails}>From: {getDate(StartDate._text)}</Text>
-                <Text style={styles.campDetails}>To: {getDate(EndDate._text)}</Text>
+                <Text style={styles.campDetails}>
+                  From: {getDate(StartDate._text)}
+                </Text>
+                <Text style={styles.campDetails}>
+                  To: {getDate(EndDate._text)}
+                </Text>
                 <Text style={styles.campDetails}>
                   Bonus: {Bonus ? Bonus._text : "NA"}
                 </Text>
@@ -213,9 +231,15 @@ const CampaignList = ({ navigation }) => {
                     view
                   </Text>
                 </Text>
-                <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.navigate('Campaign', {
-                  campId: CampaignID._text
-                })} style={styles.uploadImgBtn}>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  onPress={() =>
+                    navigation.navigate("Campaign", {
+                      campId: CampaignID._text,
+                    })
+                  }
+                  style={styles.uploadImgBtn}
+                >
                   <Text style={styles.uploadImgText}>Upload Image</Text>
                 </TouchableOpacity>
               </View>
@@ -290,14 +314,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   uploadImgBtn: {
-    position: 'absolute',
+    position: "absolute",
     height: 40,
     bottom: -20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    alignSelf: 'center',
+    alignSelf: "center",
     backgroundColor: "#522e90",
     borderRadius: 4,
     zIndex: 1,
@@ -306,5 +330,5 @@ const styles = StyleSheet.create({
   },
   uploadImgText: {
     color: "#fff",
-  }
+  },
 });

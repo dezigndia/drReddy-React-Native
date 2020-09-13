@@ -2,7 +2,7 @@ import React from "react";
 import { Linking, StatusBar, AsyncStorage, Alert } from "react-native";
 import { Provider } from "react-redux";
 import { Root, StyleProvider } from "native-base";
-import store from "src/store";
+import store from "./store";
 import firebase from "react-native-firebase";
 import AppWithNavigationState from "./navigators/Navigators";
 import VersionCheck from "react-native-version-check";
@@ -104,7 +104,7 @@ class App extends React.Component {
       .getInitialNotification();
     if (notificationOpen) {
       const { title, body } = notificationOpen.notification;
-      // this.showAlert(title, body);
+      // this.showAlert(title,s body);
     }
     /*
      * Triggered for data only payload in foreground

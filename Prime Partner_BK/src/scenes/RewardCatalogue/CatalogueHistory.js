@@ -226,26 +226,31 @@ export default class CatalogueHistory extends Component {
       GiftReceiveImageUrl3: "",
     };
 
-    const Body = Object.keys(details)
-      .map(
-        (key) =>
-          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-      )
-      .join("&");
+    // const Body = Object.keys(details)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    Body.append("OrderReference", JSON.stringify(this.state.orderId));
+    Body.append("GiftReceiveImageUrl1", "Received");
+    Body.append("GiftReceiveImageUrl2", "");
+    Body.append("GiftReceiveImageUrl3", "");
 
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
 
     fetch(baseUrl + "/UpdateOrderDeliveryByOrderReference", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         this.props.navigation.navigate("MainTab");
         this.setState({
           OTP: "",

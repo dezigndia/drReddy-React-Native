@@ -3,6 +3,7 @@ package com.techvertica.primepartner.beta;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.rnscreens.RNScreensPackage;
 import io.xogus.reactnative.versioncheck.RNVersionCheckPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.imagepicker.ImagePickerPackage;
@@ -36,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNScreensPackage(),
             new RNVersionCheckPackage(),
             new RNDeviceInfo(),
             new ImagePickerPackage(),

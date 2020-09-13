@@ -16,7 +16,7 @@ import {
 import Modal from "react-native-modal";
 import DeviceInfo from "react-native-device-info";
 
-import baseUrl, {drlUrl} from "../Constants/Constants";
+import baseUrl, { drlUrl } from "../Constants/Constants";
 import { baseUrlProd } from "../Constants/production";
 var parseString = require("xml2js").parseString;
 import * as ActionTypes from "../../data/actionTypes";
@@ -79,11 +79,11 @@ export default class Login extends Component {
     }
     this.setState({ loading: true });
     const details = {
-            // staging params
-            user: 'DRL_API',
-            password: '3JA2ASJx^7',
+      // staging params
+      user: "DRL_API",
+      password: "3JA2ASJx^7",
 
-            // prod params
+      // prod params
       Mobile: this.state.mobileNumber,
       RefralCode: "",
     };
@@ -102,12 +102,42 @@ export default class Login extends Component {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     };
+    const IsAlreadyMemberData = new FormData();
+    IsAlreadyMemberData.append(
+      "mobile",
+      JSON.stringify(this.state.mobileNumber)
+    );
 
-    fetch(baseUrlProd + "/GetOTP", options)
+    const IsAlreadyMemberoptions = {
+      method: "POST",
+      body: IsAlreadyMemberData,
+      headers: {
+        Accept: "multipart/form-data",
+        "Content-Type": "application/json",
+      },
+    };
+
+    fetch(baseUrlProd + "/IsAlreadyRegisterChemist", IsAlreadyMemberoptions)
       .then((res) => res.text())
       .then((res) => {
-        this.setState({ isVisible: true, loading: false });
-        data = JSON.parse(res);
+        console.log(res);
+        // data = JSON.parse(res);
+        fetch(baseUrlProd + "/GetOTP", options)
+          .then((res) => res.text())
+          .then((res) => {
+            this.setState({ isVisible: true, loading: false });
+            data = JSON.parse(res);
+          })
+          .catch((err) => {
+            this.setState({ loading: false });
+            Alert.alert(
+              "Prime Partner",
+              "please enter valid details",
+              [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+              { cancelable: false }
+            );
+            console.log("error", err);
+          });
       })
       .catch((err) => {
         this.setState({ loading: false });
@@ -128,29 +158,33 @@ export default class Login extends Component {
       password: "3JA2ASJx^7",
       memberLogin: this.state.memberLogin,
     };
-    const Body = Object.keys(details)
-      .map(
-        (key) =>
-          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-      )
-      .join("&");
+    // const Body = Object.keys(details)
+    //   .map(
+    //     key => encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    Body.append("user", "DRL_API");
+    Body.append("password", "3JA2ASJx^7");
+    Body.append("memberLogin", JSON.stringify(this.state.memberLogin));
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
 
     fetch(drlUrl + "/GetDefaultAccountByLogin", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
-        const parsedXml = JSON.parse(xml);
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4
+        // });
+        //const parsedXml = JSON.parse(xml);
+        const parsedXml = res;
         this.setState({ isVisible: !this.state.isVisible });
         this.setState({
           AccountID:
@@ -242,29 +276,35 @@ export default class Login extends Component {
       password: "3JA2ASJx^7",
       memberLogin: this.state.memberLogin,
     };
-    const Body = Object.keys(details)
-      .map(
-        (key) =>
-          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-      )
-      .join("&");
+    // const Body = Object.keys(details)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    Body.append("user", "DRL_API");
+    Body.append("password", "3JA2ASJx^7");
+    Body.append("memberLogin", JSON.stringify(this.state.memberLogin));
+
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
 
     fetch(drlUrl + "/GetDashboardDetailsOfChemist", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
-        const parsedXml = JSON.parse(xml);
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4,
+        // });
+        //  const parsedXml = JSON.parse(xml);
+        const parsedXml = res;
         const memberShip = this.getMembership(
           parsedXml.DashboardDetails.NextTierLevel._text
         );
@@ -296,29 +336,34 @@ export default class Login extends Component {
       password: "3JA2ASJx^7",
       MobileNo: this.state.mobileNumber,
     };
-    const Body = Object.keys(details)
-      .map(
-        (key) =>
-          encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
-      )
-      .join("&");
+    // const Body = Object.keys(details)
+    //   .map(
+    //     (key) =>
+    //       encodeURIComponent(key) + "=" + encodeURIComponent(details[key])
+    //   )
+    //   .join("&");
+    const Body = new FormData();
+    Body.append("user", "DRL_API");
+    Body.append("password", "3JA2ASJx^7");
+    Body.append("mobile", JSON.stringify(this.state.mobileNumber));
     const options = {
       method: "POST",
       body: Body,
       headers: {
         Accept: "multipart/form-data",
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     };
     fetch(drlUrl + "/GetChemistCardNoByMobileNo", options)
-      .then((res) => res.text())
+      .then((res) => res)
       .then((res) => {
-        const xml = convert.xml2json(res, {
-          compact: true,
-          spaces: 4,
-        });
+        // const xml = convert.xml2json(res, {
+        //   compact: true,
+        //   spaces: 4,
+        // });
+        //console.log(res);
         this.setState({
-          memberLogin: JSON.parse(xml).ArrayOfGetChemistCardNoResponse
+          memberLogin: JSON.parse(res).ArrayOfGetChemistCardNoResponse
             .GetChemistCardNoResponse.ChemistCardNo._text,
         });
         this.getUserDashboardDetails();
@@ -339,11 +384,11 @@ export default class Login extends Component {
     console.log("this.state.otp", this.state.otp);
     this.setState({ verifyOtpLoader: true });
     const details = {
-            // staging params
-            user: 'DRL_API',
-            password: '3JA2ASJx^7',
+      // staging params
+      user: "DRL_API",
+      password: "3JA2ASJx^7",
 
-            // prod params
+      // prod params
       Mobile: this.state.mobileNumber,
       OTP: this.state.otp,
     };
@@ -893,7 +938,7 @@ const styles = StyleSheet.create({
   enrollView: {
     // height:SCREENHEIGHT/3,
     borderWidth: 0,
-    marginTop: 30
+    marginTop: 30,
   },
   enrollText: {
     color: "#88bffa",
