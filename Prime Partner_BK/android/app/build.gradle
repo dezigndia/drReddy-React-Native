@@ -73,8 +73,9 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "index.js",
 ]
+def jscFlavor = 'org.webkit:android-jsc:+'
 
 apply from: "../../node_modules/react-native/react.gradle"
 
@@ -100,7 +101,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
     defaultConfig {
         applicationId "com.techvertica.primepartner.beta"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -157,6 +160,9 @@ android {
     packagingOptions {
         exclude 'META-INF/proguard/androidx-annotations.pro'
         exclude 'META-INF/androidx.exifinterface_exifinterface.version'
+//        exclude 'lib/arm64-v8a/libc++_shared.so'
+         pickFirst 'lib/x86/libjsc.so'
+         pickFirst 'lib/armeabi-v7a/libjsc.so'
     }
 
 }
