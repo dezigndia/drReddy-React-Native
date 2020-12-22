@@ -17,7 +17,7 @@ import Modal from "react-native-modal";
 import DeviceInfo from "react-native-device-info";
 
 import baseUrl, {drlUrl} from "../Constants/Constants";
-import { baseUrlProd } from "../Constants/production";
+import { baseUrlProd, baseUrlProdMiddleware } from "../Constants/production";
 var parseString = require("xml2js").parseString;
 import * as ActionTypes from "../../data/actionTypes";
 import orm from "src/data";
@@ -103,7 +103,7 @@ export default class Login extends Component {
       },
     };
 
-    fetch(baseUrlProd + "/GetOTP", options)
+    fetch(baseUrlProdMiddleware + "/GetOTP", options)
       .then((res) => res.text())
       .then((res) => {
         this.setState({ isVisible: true, loading: false });
@@ -232,14 +232,14 @@ export default class Login extends Component {
         console.log("error:", err);
         this.setState({ verifyOtpLoader: false });
         alert("GetDefaultAccountByLogin api fail");
-        alert("Something went wrong, please try again!");
+        // alert("Something went wrong, please try again!");
       });
   };
 
   getUserDashboardDetails = () => {
     const details = {
-      user: "DRL_API",
-      password: "3JA2ASJx^7",
+      // user: "DRL_API",
+      // password: "3JA2ASJx^7",
       memberLogin: this.state.memberLogin,
     };
     const Body = Object.keys(details)
@@ -257,28 +257,38 @@ export default class Login extends Component {
       },
     };
 
-    fetch(drlUrl + "/GetDashboardDetailsOfChemist", options)
+    fetch(baseUrlProd + "/GetDashboardDetailsOfChemist", options)
       .then((res) => res.text())
       .then((res) => {
+        console.log('GetDashboardDetailsOfChemist res', res);
+        console.log(res);
+        const parsedRes = JSON.parse(res);
+        console.log('parsedRes', parsedRes);
+        // console.log(parsedRes.status);
+        console.log(parsedRes.data.Envelope.Body.GetDashboardDetailsOfChemistResponse);
+        // console.log(parsedRes.data.GetDashboardDetailsOfChemistResponse.GetDashboardDetailsOfChemistResult.PointsEarned._text);
         const xml = convert.xml2json(res, {
           compact: true,
           spaces: 4,
         });
         const parsedXml = JSON.parse(xml);
+        console.log('unparsed xml', parsedXml);
+
         const memberShip = this.getMembership(
-          parsedXml.DashboardDetails.NextTierLevel._text
+          parsedRes.DashboardDetails.NextTierLevel._text
         );
+        console.log('xml', parsedXml, parsedXml.DashboardDetails.DaysRemainingforNextTier._text);
         this.setState({
           DaysRemainingforNextTier:
-            parsedXml.DashboardDetails.DaysRemainingforNextTier._text,
-          LastTierUpgradeDate:
-            parsedXml.DashboardDetails.LastTierUpgradeDate._text,
-          NextTierLevel: parsedXml.DashboardDetails.NextTierLevel._text,
-          PointsEarned: parsedXml.DashboardDetails.PointsEarned._text,
-          Points: parsedXml.DashboardDetails.PointsEarned._text,
-          PointsRequired: parsedXml.DashboardDetails.PointsRequired._text,
-          Value: parsedXml.DashboardDetails.Value._text,
-          Membership: memberShip,
+            parsedXml.data.DaysRemainingforNextTier._text,
+          // LastTierUpgradeDate:
+          //   parsedXml.DashboardDetails.LastTierUpgradeDate._text,
+          // NextTierLevel: parsedXml.DashboardDetails.NextTierLevel._text,
+          // PointsEarned: parsedXml.DashboardDetails.PointsEarned._text,
+          // Points: parsedXml.DashboardDetails.PointsEarned._text,
+          // PointsRequired: parsedXml.DashboardDetails.PointsRequired._text,
+          // Value: parsedXml.DashboardDetails.Value._text,
+          // Membership: memberShip,
         });
         this.getAccountDetails();
       })
@@ -286,14 +296,14 @@ export default class Login extends Component {
         console.log("error:", err);
         this.setState({ verifyOtpLoader: false });
         alert("GetDashboardDetailsOfChemist api fail");
-        alert("Something went wrong, please try again!");
+        // alert("Something went wrong, please try again!");
       });
   };
 
   getUserCardNumber = () => {
     const details = {
-      user: "DRL_API",
-      password: "3JA2ASJx^7",
+      // user: "DRL_API",
+      // password: "3JA2ASJx^7",
       MobileNo: this.state.mobileNumber,
     };
     const Body = Object.keys(details)
@@ -310,16 +320,17 @@ export default class Login extends Component {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     };
-    fetch(drlUrl + "/GetChemistCardNoByMobileNo", options)
+    fetch(baseUrlProdMiddleware + "/GetChemistCardNoByMobileNo", options)
       .then((res) => res.text())
       .then((res) => {
+        // console.log('GetChemistCardNoByMobileNo response', res);
         const xml = convert.xml2json(res, {
           compact: true,
           spaces: 4,
         });
+        // console.log('xml', xml, JSON.parse(xml).string._text);
         this.setState({
-          memberLogin: JSON.parse(xml).ArrayOfGetChemistCardNoResponse
-            .GetChemistCardNoResponse.ChemistCardNo._text,
+          memberLogin: JSON.parse(xml).string._text,
         });
         this.getUserDashboardDetails();
       })
@@ -327,7 +338,7 @@ export default class Login extends Component {
         console.log("error:", err);
         this.setState({ verifyOtpLoader: false });
         alert("GetChemistCardNoByMobileNo api fail");
-        alert("Something went wrong, please try again!");
+        // alert("Something went wrong, please try again!");
       });
   };
 
@@ -363,7 +374,7 @@ export default class Login extends Component {
       },
     };
 
-    fetch(baseUrlProd + "/MatchOTP", options)
+    fetch(baseUrlProdMiddleware + "/MatchOTP", options)
       .then((res) => res.text())
       .then((res) => {
         let data = JSON.parse(res);
