@@ -15,7 +15,7 @@
     "moment": "^2.24.0",
     "native-base": "^2.12.2",
     "react": "16.8.3",
-    "react-native": "0.59.9",
+    "react-native": "0.62.3",
     "react-native-camera": "^2.11.2",
     "react-native-charts-wrapper": "^0.5.7",
     "react-native-countup": "^0.0.2",
